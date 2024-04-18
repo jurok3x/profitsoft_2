@@ -28,4 +28,7 @@ public class Article {
 
     @Column(name = "journal", columnDefinition = "varchar(50)")
     private String journal;
+
+    @Column(name = "title", columnDefinition = "varchar(50)")
+    private String title;
 }
