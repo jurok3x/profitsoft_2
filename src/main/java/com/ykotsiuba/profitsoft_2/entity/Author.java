@@ -20,6 +20,6 @@ public class Author {
     @Column(name = "last_name", columnDefinition = "varchar(50)")
     private String lastName;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "powerStation")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "author")
     private List<Article> articles;
 }
