@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+    <property name="uuid_function" value="uuid_generate_v4()" dbms="postgresql"/>
+    <changeSet id="1.1" author="ykotsiuba">
+        <createTable tableName="articles">
+            <column defaultValueComputed="${uuid_function}" name="id" type="uuid">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="author_id" type="uuid">
+                <constraints foreignKeyName="fk_author"
+                             referencedTableName="authors"
+                             referencedColumnNames="id"
+                />
+            </column>
+            <column name="field" type="varchar(50)"/>
+            <column name="title" type="varchar(50)"/>
+            <column name="journal" type="varchar(50)"/>
+            <column name="year" type="integer"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
