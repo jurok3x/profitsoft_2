@@ -1,0 +1,6 @@
+package com.ykotsiuba.profitsoft_2.entity;
+
+public enum Field {
+    PHYSICS, CHEMISTRY, ENGINEERING, ASTRONOMY, HISTORY,
+    BIOLOGY, MATHEMATICS, LITERATURE, COMPUTER_SCIENCE, PSYCHOLOGY
+}
