@@ -1,6 +1,7 @@
 package com.ykotsiuba.profitsoft_2.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.UUID;
 
 @Data
 @Entity
+@Builder
 @Table(name = "authors")
 public class Author {
     @Id
