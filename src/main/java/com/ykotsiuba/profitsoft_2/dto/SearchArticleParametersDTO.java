@@ -1,6 +1,5 @@
 package com.ykotsiuba.profitsoft_2.dto;
 
-import com.ykotsiuba.profitsoft_2.entity.Field;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ArticleSearchDTO {
+public class SearchArticleParametersDTO {
     private String titlePart;
     private String field;
     private String authorFirstName;
