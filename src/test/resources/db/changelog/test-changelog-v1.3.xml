@@ -3,9 +3,7 @@
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
-
-    <include file="db/changelog/changelog-v1.0.xml"/>
-    <include file="db/changelog/changelog-v1.1.xml"/>
-    <include file="db/changelog/changelog-v1.2.xml"/>
-    <include file="db/changelog/changelog-v1.3.xml"/>
+    <changeSet id="1.2" author="ykotsiuba" labels="data">
+        <loadData file="db/changelog/data/test-articles.csv" tableName="articles"/>
+    </changeSet>
 </databaseChangeLog>

@@ -5,8 +5,11 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
     <property name="uuid_function" value="uuid_generate_v4()" dbms="postgresql"/>
     <changeSet id="1.1" author="ykotsiuba">
+        <sql><![CDATA[
+            CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+        ]]></sql>
         <createTable tableName="articles">
-            <column defaultValueComputed="${uuid_function}" name="id" type="uuid">
+            <column name="id" defaultValueComputed="${uuid_function}" type="uuid">
                 <constraints primaryKey="true"/>
             </column>
             <column name="author_id" type="uuid">
