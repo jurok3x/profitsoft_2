@@ -20,10 +20,10 @@ public class SaveArticleRequestDTO {
 
     @NotNull(message = "field is required")
     @ValidEnum(enumClass = Field.class)
-    private Field field;
+    private String field;
 
-    @NotNull(message = "author is required")
-    private SaveAuthorRequestDTO authorDTO;
+    @NotBlank(message = "author is required")
+    private String authorId;
 
     @NotNull(message = "year is required")
     @ValidYear
