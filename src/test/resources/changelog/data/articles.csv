@@ -1,0 +1,11 @@
+id,author_id,field,year,journal,title
+00000000-0000-0000-0000-000000000001,f47ac10b-58cc-4372-a567-0e02b2c3d479,PHYSICS,2020,Physics Today,Introduction to Quantum Mechanics
+00000000-0000-0000-0000-000000000002,7b902bc4-43fd-4a13-95b9-681009c21256,CHEMISTRY,2018,Chemical Reviews,Fundamentals of Organic Chemistry
+00000000-0000-0000-0000-000000000003,c49ee8f8-d8dc-4483-83eb-5712025b7730,BIOLOGY,2019,Nature,The Origin of Species
+00000000-0000-0000-0000-000000000004,8a9c6a1b-1f91-42c4-bb10-31eeb7d64823,ENGINEERING,2017,IEEE Transactions on Robotics,Introduction to Robotics
+00000000-0000-0000-0000-000000000005,c5cfec53-414a-4586-a8d5-d0a6f23f0bb2,MEDICINE,2016,New England Journal of Medicine,Clinical Pharmacology
+00000000-0000-0000-0000-000000000006,a946021d-c3e4-456e-bd6b-f27d9b4376a1,MATHEMATICS,2022,Journal of Mathematical Analysis and Applications,Introduction to Calculus
+00000000-0000-0000-0000-000000000007,d58a78a9-0d0f-47e4-93c4-7e9fb454c5a0,COMPUTER_SCIENCE,2021,ACM Transactions on Computer Systems,Introduction to Algorithms
+00000000-0000-0000-0000-000000000008,90a4410c-d0ac-4e18-8f10-7f4e17e8a999,ECONOMICS,2015,Journal of Economic Literature,Principles of Microeconomics
+00000000-0000-0000-0000-000000000009,f49df5b0-0a67-42e2-8555-573ec777eb02,PSYCHOLOGY,2014,Journal of Abnormal Psychology,Introduction to Psychology
+00000000-0000-0000-0000-000000000010,d8d29f11-d569-47c0-a445-2b1636ee19b2,LINGUISTICS,2013,Linguistic Inquiry,Introduction to Linguistics
