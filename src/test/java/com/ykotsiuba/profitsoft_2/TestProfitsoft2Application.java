@@ -10,10 +10,17 @@ import org.testcontainers.utility.DockerImageName;
 @TestConfiguration(proxyBeanMethods = false)
 public class TestProfitsoft2Application {
 
+	private static final String DATABASE_NAME = "testdb";
+	private static final String USERNAME = "testuser";
+	private static final String PASSWORD = "testpass";
+
 	@Bean
 	@ServiceConnection
 	PostgreSQLContainer<?> postgresContainer() {
-		return new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"));
+		return new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"))
+				.withDatabaseName(DATABASE_NAME)
+				.withUsername(USERNAME)
+				.withPassword(PASSWORD);
 	}
 
 	public static void main(String[] args) {
