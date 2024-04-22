@@ -20,7 +20,6 @@ public class AuthorServiceImpl implements AuthorService {
     private static final String AUTHOR_NOT_FOUND = "Author not found for ID: %s";
 
     private static final String AUTHOR_DELETED = "Deleted author with ID: %s";
-    private static final String INVALID_UUID = "Invalid UUID format";
 
     private final AuthorRepository authorRepository;
 
@@ -33,17 +32,9 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     private Author findOrThrow(String id) {
-        UUID uuid = UUIDFromString(id);
+        UUID uuid = UUID.fromString(id);
         Optional<Author> optionalAuthor = authorRepository.findById(uuid);
         return optionalAuthor.orElseThrow(() -> new IllegalArgumentException(String.format(AUTHOR_NOT_FOUND, id)));
-    }
-
-    private UUID UUIDFromString(String id) {
-        try {
-            return UUID.fromString(id);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(INVALID_UUID);
-        }
     }
 
     @Override

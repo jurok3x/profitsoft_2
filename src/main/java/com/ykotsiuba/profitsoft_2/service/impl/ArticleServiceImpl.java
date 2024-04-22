@@ -1,30 +1,67 @@
 package com.ykotsiuba.profitsoft_2.service.impl;
 
 import com.ykotsiuba.profitsoft_2.dto.*;
+import com.ykotsiuba.profitsoft_2.entity.Article;
+import com.ykotsiuba.profitsoft_2.entity.Author;
+import com.ykotsiuba.profitsoft_2.entity.Field;
 import com.ykotsiuba.profitsoft_2.mapper.ArticleMapper;
+import com.ykotsiuba.profitsoft_2.mapper.AuthorMapper;
 import com.ykotsiuba.profitsoft_2.repository.ArticleRepository;
 import com.ykotsiuba.profitsoft_2.service.ArticleService;
+import com.ykotsiuba.profitsoft_2.service.AuthorService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Optional;
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class ArticleServiceImpl implements ArticleService {
 
-    private final ArticleRepository repository;
+    private static final String ARTICLE_NOT_FOUND = "Article not found for ID: %s";
 
-    private final ArticleMapper mapper;
+    private final ArticleRepository articleRepository;
+
+    private final AuthorService authorService;
+
+    private final ArticleMapper articleMapper;
+
+    private final AuthorMapper authorMapper;
 
     @Override
     public ArticleDTO save(SaveArticleRequestDTO requestDTO) {
-        return null;
+        Article savedArticle = prepareArticle(requestDTO);
+        return articleMapper.toDTO(savedArticle);
+    }
+
+    private Article prepareArticle(SaveArticleRequestDTO requestDTO) {
+        return Article.builder()
+                .title(requestDTO.getTitle())
+                .field(Field.valueOf(requestDTO.getField()))
+                .journal(requestDTO.getJournal())
+                .year(requestDTO.getYear())
+                .author(findAuthor(requestDTO.getAuthorId()))
+                .build();
+    }
+
+    private Author findAuthor(String id) {
+        AuthorDTO authorDTO = authorService.findById(id);
+        return authorMapper.toEntity(authorDTO);
     }
 
     @Override
     public ArticleDTO findById(String id) {
-        return null;
+        Article article = findOrThrow(id);
+        return articleMapper.toDTO(article);
+    }
+
+    private Article findOrThrow(String id) {
+        UUID uuid = UUID.fromString(id);
+        Optional<Article> optionalAuthor = articleRepository.findById(uuid);
+        return optionalAuthor.orElseThrow(() -> new IllegalArgumentException(String.format(ARTICLE_NOT_FOUND, id)));
     }
 
     @Override
