@@ -1,6 +1,5 @@
 package com.ykotsiuba.profitsoft_2.validation;
 
-import com.ykotsiuba.profitsoft_2.validation.annotation.ValidEnum;
 import com.ykotsiuba.profitsoft_2.validation.annotation.ValidYear;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
