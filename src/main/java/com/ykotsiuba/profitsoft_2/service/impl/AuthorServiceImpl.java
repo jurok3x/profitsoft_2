@@ -29,8 +29,7 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     public AuthorDTO findById(String id) {
         Author author = findOrThrow(id);
-        AuthorDTO authorDTO = authorMapper.toDTO(author);
-        return authorDTO;
+        return authorMapper.toDTO(author);
     }
 
     private Author findOrThrow(String id) {
@@ -40,9 +39,8 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     private UUID UUIDFromString(String id) {
-        UUID uuid;
         try {
-            uuid = UUID.fromString(id);
+            return UUID.fromString(id);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(INVALID_UUID);
         }
@@ -52,8 +50,7 @@ public class AuthorServiceImpl implements AuthorService {
     public AuthorDTO save(SaveAuthorRequestDTO requestDTO) {
         Author authorRequest = prepareAuthor(requestDTO);
         Author savedAuthor = authorRepository.save(authorRequest);
-        AuthorDTO authorDTO = authorMapper.toDTO(savedAuthor);
-        return authorDTO;
+        return authorMapper.toDTO(savedAuthor);
     }
 
     private Author prepareAuthor(SaveAuthorRequestDTO requestDTO) {
@@ -69,8 +66,7 @@ public class AuthorServiceImpl implements AuthorService {
         Author authorRequest = prepareAuthor(requestDTO);
         authorRequest.setArticles(author.getArticles());
         Author savedAuthor = authorRepository.save(authorRequest);
-        AuthorDTO authorDTO = authorMapper.toDTO(savedAuthor);
-        return authorDTO;
+        return authorMapper.toDTO(savedAuthor);
     }
 
     @Override
