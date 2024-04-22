@@ -1,6 +1,5 @@
 package com.ykotsiuba.profitsoft_2.dto;
 
-import com.ykotsiuba.profitsoft_2.validation.annotation.ValidSearchRequest;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -13,7 +12,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ValidSearchRequest
 public class SearchArticleRequestDTO {
     private String titlePart;
     private String field;
