@@ -2,13 +2,19 @@ package com.ykotsiuba.profitsoft_2.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-@Data
 @Entity
 @Table(name = "articles")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Article {
     @Id
     @Column(name = "id",unique=true, nullable = false)

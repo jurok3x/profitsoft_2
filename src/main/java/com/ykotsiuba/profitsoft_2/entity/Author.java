@@ -1,16 +1,20 @@
 package com.ykotsiuba.profitsoft_2.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.UUID;
 
-@Data
 @Entity
-@Builder
 @Table(name = "authors")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Author {
     @Id
     @Column(name = "id",unique=true, nullable = false)
