@@ -80,15 +80,15 @@ class ArticleControllerTest {
 
     @Test
     public void testGetArticle_notFound() throws Exception {
-        String errorId = "00000000-0000-0000-0000-000000000099";
-        MvcResult mvcResult = mvc.perform(get(String.format(ID_URL, errorId)))
+        String invalidId = "00000000-0000-0000-0000-000000000099";
+        MvcResult mvcResult = mvc.perform(get(String.format(ID_URL, invalidId)))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         String response = mvcResult.getResponse().getContentAsString();
         APIException responseDTO = DEFAULT_MAPPER.readValue(response, APIException.class);
-        assertEquals(String.format("Article not found for ID: %s", errorId), responseDTO.getErrors().get(0));
+        assertEquals(String.format("Article not found for ID: %s", invalidId), responseDTO.getErrors().get(0));
     }
 
     @Test
