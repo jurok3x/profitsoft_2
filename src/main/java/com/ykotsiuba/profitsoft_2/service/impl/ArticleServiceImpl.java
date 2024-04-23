@@ -21,6 +21,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ArticleServiceImpl implements ArticleService {
 
+    private static final String ARTICLE_DELETED ="Article deleted successfully.";
+
     private static final String ARTICLE_NOT_FOUND = "Article not found for ID: %s";
 
     private final ArticleRepository articleRepository;
@@ -67,12 +69,20 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public ArticleDTO update(SaveArticleRequestDTO requestDTO, String id) {
-        return null;
+        Article article = findOrThrow(id);// assume I do not want update non existing articles
+        Article articleRequest = prepareArticle(requestDTO);
+        articleRequest.setId(article.getId());
+        Article updatedArticle = articleRepository.save(articleRequest);
+        return articleMapper.toDTO(updatedArticle);
     }
 
     @Override
     public DeleteArticleResponseDTO delete(String id) {
-        return null;
+        Article article = findOrThrow(id);
+        articleRepository.delete(article);
+        return DeleteArticleResponseDTO.builder()
+                .message(ARTICLE_DELETED)
+                .build();
     }
 
     @Override
