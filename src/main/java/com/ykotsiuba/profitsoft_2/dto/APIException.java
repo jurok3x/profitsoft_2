@@ -1,6 +1,5 @@
 package com.ykotsiuba.profitsoft_2.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
