@@ -1,20 +1,28 @@
 package com.ykotsiuba.profitsoft_2.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.util.UUID;
 
-@Data
 @Entity
 @Table(name = "articles")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Article {
+
     @Id
     @Column(name = "id",unique=true, nullable = false)
+    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
     private UUID id;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "author_id")
     private Author author;

@@ -3,13 +3,7 @@
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
-    <changeSet id="1.0" author="ykotsiuba">
-        <createTable tableName="authors">
-            <column name="id" type="uuid">
-                <constraints primaryKey="true"/>
-            </column>
-            <column name="first_name" type="varchar(50)"/>
-            <column name="last_name" type="varchar(50)"/>
-        </createTable>
+    <changeSet id="1.2" author="ykotsiuba" labels="data">
+        <loadData file="db/changelog/data/test-authors.csv" tableName="authors"/>
     </changeSet>
 </databaseChangeLog>
