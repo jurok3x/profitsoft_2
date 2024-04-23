@@ -21,7 +21,7 @@ public class AuthorServiceImpl implements AuthorService {
 
     private static final String AUTHOR_NOT_FOUND = "Author not found for ID: %s";
 
-    private static final String AUTHOR_DELETED = "Deleted author with ID: %s";
+    private static final String AUTHOR_DELETED = "Author deleted successfully.";
 
     private final AuthorRepository authorRepository;
 
@@ -65,9 +65,10 @@ public class AuthorServiceImpl implements AuthorService {
     public AuthorDTO update(SaveAuthorRequestDTO requestDTO, String id) {
         Author author = findOrThrow(id);
         Author authorRequest = prepareAuthor(requestDTO);
+        authorRequest.setId(author.getId());
         authorRequest.setArticles(author.getArticles());
-        Author savedAuthor = authorRepository.save(authorRequest);
-        return authorMapper.toDTO(savedAuthor);
+        Author updatedAuthor = authorRepository.save(authorRequest);
+        return authorMapper.toDTO(updatedAuthor);
     }
 
     @Override
@@ -75,8 +76,7 @@ public class AuthorServiceImpl implements AuthorService {
         Author author = findOrThrow(id);
         authorRepository.delete(author);
         DeleteAuthorResponseDTO responseDTO = new DeleteAuthorResponseDTO();
-        String message = String.format(AUTHOR_DELETED, author.getId());
-        responseDTO.setMessage(message);
+        responseDTO.setMessage(AUTHOR_DELETED);
         return responseDTO;
     }
 }
