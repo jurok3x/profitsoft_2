@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,8 +17,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Author {
+
     @Id
     @Column(name = "id",unique=true, nullable = false)
+    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
     private UUID id;
 
     @Column(name = "first_name", columnDefinition = "varchar(50)")

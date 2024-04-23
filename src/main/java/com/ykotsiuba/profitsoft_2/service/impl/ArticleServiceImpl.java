@@ -33,7 +33,8 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public ArticleDTO save(SaveArticleRequestDTO requestDTO) {
-        Article savedArticle = prepareArticle(requestDTO);
+        Article articleRequest = prepareArticle(requestDTO);
+        Article savedArticle = articleRepository.save(articleRequest);
         return articleMapper.toDTO(savedArticle);
     }
 
