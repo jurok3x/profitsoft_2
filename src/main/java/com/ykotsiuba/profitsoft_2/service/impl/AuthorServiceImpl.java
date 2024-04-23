@@ -11,6 +11,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,6 +31,14 @@ public class AuthorServiceImpl implements AuthorService {
     public AuthorDTO findById(String id) {
         Author author = findOrThrow(id);
         return authorMapper.toDTO(author);
+    }
+
+    @Override
+    public List<AuthorDTO> findAll() {
+        List<Author> authors = authorRepository.findAll();
+        return authors.stream()
+                .map(authorMapper::toDTO)
+                .toList();
     }
 
     private Author findOrThrow(String id) {
