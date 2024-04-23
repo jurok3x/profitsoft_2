@@ -23,6 +23,9 @@ public class Author {
     @UuidGenerator(style = UuidGenerator.Style.RANDOM)
     private UUID id;
 
+    @Column(name = "email", unique=true, nullable = false, columnDefinition = "varchar(50)")
+    private String email;
+
     @Column(name = "first_name", columnDefinition = "varchar(50)")
     private String firstName;
 

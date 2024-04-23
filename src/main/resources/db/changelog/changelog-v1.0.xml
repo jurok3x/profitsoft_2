@@ -8,6 +8,9 @@
             <column name="id" type="uuid">
                 <constraints primaryKey="true"/>
             </column>
+            <column name="email" type="varchar(50)">
+                <constraints unique="true" nullable="false"/>
+            </column>
             <column name="first_name" type="varchar(50)"/>
             <column name="last_name" type="varchar(50)"/>
         </createTable>

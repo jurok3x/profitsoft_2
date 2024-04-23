@@ -12,6 +12,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SaveAuthorRequestDTO {
 
+    @NotBlank(message = "email is required")
+    private String email;
+
     @NotBlank(message = "firstName is required")
     private String firstName;
 
