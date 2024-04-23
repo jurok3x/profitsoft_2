@@ -52,8 +52,8 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public AuthorDTO save(SaveAuthorRequestDTO requestDTO) {
-        Optional<Author> optionalAuthor = findByEmail(requestDTO.getEmail());
-        if(optionalAuthor.isPresent()) {
+        Optional<Author> byEmail = findByEmail(requestDTO.getEmail());
+        if(byEmail.isPresent()) {
             throw new IllegalArgumentException(String.format(AUTHOR_ALREADY_EXISTS.getMessage(), requestDTO.getEmail()));
         }
         Author authorRequest = prepareAuthor(requestDTO);
@@ -71,8 +71,11 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     public AuthorDTO update(SaveAuthorRequestDTO requestDTO, String id) {
         Author author = findOrThrow(id);
-        if(!author.getEmail().equals(requestDTO.getEmail())) {
-            throw new IllegalArgumentException(AUTHOR_UPDATE_ERROR.getMessage());
+        Optional<Author> byEmail = findByEmail(requestDTO.getEmail());
+        if(byEmail.isPresent()) {
+            if(!author.getEmail().equals(byEmail.get().getEmail())) {
+                throw new IllegalArgumentException(AUTHOR_UPDATE_ERROR.getMessage());
+            }
         }
         Author authorRequest = prepareAuthor(requestDTO);
         authorRequest.setId(author.getId());
