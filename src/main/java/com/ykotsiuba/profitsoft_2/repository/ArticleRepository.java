@@ -14,7 +14,11 @@ import java.util.UUID;
 public interface ArticleRepository extends JpaRepository<Article, UUID> {
 
     @Query("SELECT a FROM Article a WHERE (:#{#search.field} is null or a.field = :#{#search.field})"
-    + "and (:#{#search.journal} is null or a.journal = :#{#search.journal})")
+            + "and (:#{#search.journal} is null or a.journal = :#{#search.journal})"
+            + "and (:#{#search.year} is null or a.year = :#{#search.year})"
+            + "and (:#{#search.authorId} is null or a.author = :#{#search.authorId})"
+            + "and (:#{#search.titlePart} is null or a.title ILIKE '%:#{#search.titlePart}%')"
+    )
     List<Article> search(@Param("search") SearchArticleRequestDTO searchDTO);
 
 }
