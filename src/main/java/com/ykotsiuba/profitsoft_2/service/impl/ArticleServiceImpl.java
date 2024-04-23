@@ -22,13 +22,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.ykotsiuba.profitsoft_2.entity.enums.ArticleMessages.ARTICLE_DELETED;
+import static com.ykotsiuba.profitsoft_2.entity.enums.ArticleMessages.ARTICLE_NOT_FOUND;
+
 @Service
 @RequiredArgsConstructor
 public class ArticleServiceImpl implements ArticleService {
-
-    private static final String ARTICLE_DELETED ="Article deleted successfully.";
-
-    private static final String ARTICLE_NOT_FOUND = "Article not found for ID: %s";
 
     private final ArticleRepository articleRepository;
 
@@ -69,7 +68,7 @@ public class ArticleServiceImpl implements ArticleService {
     private Article findOrThrow(String id) {
         UUID uuid = UUID.fromString(id);
         Optional<Article> optionalAuthor = articleRepository.findById(uuid);
-        return optionalAuthor.orElseThrow(() -> new EntityNotFoundException(String.format(ARTICLE_NOT_FOUND, id)));
+        return optionalAuthor.orElseThrow(() -> new EntityNotFoundException(String.format(ARTICLE_NOT_FOUND.getMessage(), id)));
     }
 
     @Override
@@ -86,7 +85,7 @@ public class ArticleServiceImpl implements ArticleService {
         Article article = findOrThrow(id);
         articleRepository.delete(article);
         return DeleteArticleResponseDTO.builder()
-                .message(ARTICLE_DELETED)
+                .message(ARTICLE_DELETED.getMessage())
                 .build();
     }
 

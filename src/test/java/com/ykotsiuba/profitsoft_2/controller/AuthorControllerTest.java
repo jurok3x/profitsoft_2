@@ -13,6 +13,7 @@ import com.ykotsiuba.profitsoft_2.dto.AuthorDTO;
 import com.ykotsiuba.profitsoft_2.dto.DeleteAuthorResponseDTO;
 import com.ykotsiuba.profitsoft_2.dto.SaveAuthorRequestDTO;
 import com.ykotsiuba.profitsoft_2.entity.Author;
+import com.ykotsiuba.profitsoft_2.entity.enums.AuthorMessages;
 import com.ykotsiuba.profitsoft_2.repository.AuthorRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.ykotsiuba.profitsoft_2.entity.enums.AuthorMessages.AUTHOR_DELETED;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -130,6 +132,27 @@ class AuthorControllerTest {
 
     @Test
     @Transactional
+    public void testSaveAuthor_emailExists() throws Exception {
+        SaveAuthorRequestDTO saveAuthorRequestDTO = prepareSaveRequest();
+        saveAuthorRequestDTO.setFirstName(null);
+        saveAuthorRequestDTO.setLastName(null);
+        String body = DEFAULT_MAPPER.writeValueAsString(saveAuthorRequestDTO);
+
+        MvcResult mvcResult = mvc.perform(post(API_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        String response = mvcResult.getResponse().getContentAsString();
+        APIException responseDTO = DEFAULT_MAPPER.readValue(response, APIException.class);
+        //todo implement
+    }
+
+    @Test
+    @Transactional
     public void testUpdateAuthor() throws Exception {
         SaveAuthorRequestDTO updateAuthorRequestDTO = prepareSaveRequest();
         String body = DEFAULT_MAPPER.writeValueAsString(updateAuthorRequestDTO);
@@ -154,6 +177,26 @@ class AuthorControllerTest {
 
     @Test
     @Transactional
+    public void testUpdateAuthor_invalidEmail() throws Exception {
+        SaveAuthorRequestDTO updateAuthorRequestDTO = prepareSaveRequest();
+        String body = DEFAULT_MAPPER.writeValueAsString(updateAuthorRequestDTO);
+
+        MvcResult mvcResult = mvc.perform(put(String.format(ID_URL, ID))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        String response = mvcResult.getResponse().getContentAsString();
+        AuthorDTO responseDTO = DEFAULT_MAPPER.readValue(response, AuthorDTO.class);
+        assertEquals(updateAuthorRequestDTO.getFirstName(), responseDTO.getFirstName());
+        //todo implement
+    }
+
+    @Test
+    @Transactional
     public void testDeleteAuthor() throws Exception {
         MvcResult mvcResult = mvc.perform(delete(String.format(ID_URL, ID)))
                 .andExpect(status().isOk())
@@ -162,7 +205,7 @@ class AuthorControllerTest {
 
         String response = mvcResult.getResponse().getContentAsString();
         DeleteAuthorResponseDTO responseDTO = DEFAULT_MAPPER.readValue(response, DeleteAuthorResponseDTO.class);
-        assertEquals("Author deleted successfully.", responseDTO.getMessage());
+        assertEquals(AUTHOR_DELETED.getMessage(), responseDTO.getMessage());
 
         Optional<Author> byId = authorRepository.findById(UUID.fromString(ID));
         assertTrue(byId.isEmpty());
