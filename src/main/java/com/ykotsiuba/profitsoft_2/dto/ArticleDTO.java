@@ -1,7 +1,7 @@
 package com.ykotsiuba.profitsoft_2.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ykotsiuba.profitsoft_2.entity.Field;
+import com.ykotsiuba.profitsoft_2.entity.enums.Field;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

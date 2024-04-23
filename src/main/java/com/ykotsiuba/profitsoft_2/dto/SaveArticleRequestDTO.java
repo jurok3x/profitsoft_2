@@ -1,6 +1,6 @@
 package com.ykotsiuba.profitsoft_2.dto;
 
-import com.ykotsiuba.profitsoft_2.entity.Field;
+import com.ykotsiuba.profitsoft_2.entity.enums.Field;
 import com.ykotsiuba.profitsoft_2.validation.annotation.ValidEnum;
 import com.ykotsiuba.profitsoft_2.validation.annotation.ValidYear;
 import jakarta.validation.constraints.NotBlank;

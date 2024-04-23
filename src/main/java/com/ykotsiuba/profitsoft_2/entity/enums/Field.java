@@ -1,4 +1,4 @@
-package com.ykotsiuba.profitsoft_2.entity;
+package com.ykotsiuba.profitsoft_2.entity.enums;
 
 public enum Field {
     PHYSICS, CHEMISTRY, ENGINEERING, ASTRONOMY, HISTORY,
