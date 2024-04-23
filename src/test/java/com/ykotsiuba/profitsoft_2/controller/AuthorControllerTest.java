@@ -13,7 +13,6 @@ import com.ykotsiuba.profitsoft_2.dto.AuthorDTO;
 import com.ykotsiuba.profitsoft_2.dto.DeleteAuthorResponseDTO;
 import com.ykotsiuba.profitsoft_2.dto.SaveAuthorRequestDTO;
 import com.ykotsiuba.profitsoft_2.entity.Author;
-import com.ykotsiuba.profitsoft_2.entity.enums.AuthorMessages;
 import com.ykotsiuba.profitsoft_2.repository.AuthorRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
