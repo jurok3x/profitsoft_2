@@ -76,6 +76,20 @@ class ArticleControllerTest {
     }
 
     @Test
+    public void testGetArticle_notFound() throws Exception {
+        String id = "00000000-0000-0000-0000-000000000099";
+        String url = String.format("/articles/%s", id);
+        MvcResult mvcResult = mvc.perform(get(url))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        String response = mvcResult.getResponse().getContentAsString();
+        APIException responseDTO = DEFAULT_MAPPER.readValue(response, APIException.class);
+        assertEquals(String.format("Article not found for ID: %s", id), responseDTO.getErrors().get(0));
+    }
+
+    @Test
     @Transactional
     public void testSaveArticle() throws Exception {
         String url = "/articles";

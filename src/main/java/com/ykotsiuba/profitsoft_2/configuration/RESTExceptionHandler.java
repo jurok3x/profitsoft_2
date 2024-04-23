@@ -26,7 +26,7 @@ public class RESTExceptionHandler  extends ResponseEntityExceptionHandler {
         List<String> details = new ArrayList<String>();
         details.add(ex.getMessage());
 
-        APIException apiException = new APIException("Entity not found", HttpStatus.BAD_REQUEST,
+        APIException apiException = new APIException("Entity not found", HttpStatus.NOT_FOUND,
                 LocalDateTime.now(), details);
         return new ResponseEntity<>(apiException, apiException.getHttpStatus());
     }
