@@ -7,6 +7,7 @@ import com.ykotsiuba.profitsoft_2.entity.Author;
 import com.ykotsiuba.profitsoft_2.mapper.AuthorMapper;
 import com.ykotsiuba.profitsoft_2.repository.AuthorRepository;
 import com.ykotsiuba.profitsoft_2.service.AuthorService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +35,7 @@ public class AuthorServiceImpl implements AuthorService {
     private Author findOrThrow(String id) {
         UUID uuid = UUID.fromString(id);
         Optional<Author> optionalAuthor = authorRepository.findById(uuid);
-        return optionalAuthor.orElseThrow(() -> new IllegalArgumentException(String.format(AUTHOR_NOT_FOUND, id)));
+        return optionalAuthor.orElseThrow(() -> new EntityNotFoundException(String.format(AUTHOR_NOT_FOUND, id)));
     }
 
     @Override

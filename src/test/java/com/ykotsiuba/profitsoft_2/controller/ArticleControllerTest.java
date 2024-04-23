@@ -3,9 +3,11 @@ package com.ykotsiuba.profitsoft_2.controller;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.JsonPath;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ykotsiuba.profitsoft_2.Profitsoft2Application;
 import com.ykotsiuba.profitsoft_2.TestProfitsoft2Application;
+import com.ykotsiuba.profitsoft_2.dto.APIException;
 import com.ykotsiuba.profitsoft_2.dto.ArticleDTO;
 import com.ykotsiuba.profitsoft_2.dto.DeleteArticleResponseDTO;
 import com.ykotsiuba.profitsoft_2.dto.SaveArticleRequestDTO;
@@ -22,6 +24,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -45,7 +49,9 @@ class ArticleControllerTest {
     static {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL.NON_NULL);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         DEFAULT_MAPPER = mapper;
     }
 
@@ -91,6 +97,28 @@ class ArticleControllerTest {
 
         Optional<Article> byId = articleRepository.findById(id);
         assertNotNull(byId.get());
+    }
+
+    @Test
+    @Transactional
+    public void testSaveArticle_Error() throws Exception {
+        String url = "/articles";
+        SaveArticleRequestDTO saveArticleRequestDTO = prepareSaveRequest();
+        saveArticleRequestDTO.setTitle(null);
+        saveArticleRequestDTO.setJournal(null);
+        String body = DEFAULT_MAPPER.writeValueAsString(saveArticleRequestDTO);
+
+        MvcResult mvcResult = mvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+          String response = mvcResult.getResponse().getContentAsString();
+          APIException responseDTO = DEFAULT_MAPPER.readValue(response, APIException.class);
+          assertEquals(2, responseDTO.getErrors().size());
     }
 
     @Test

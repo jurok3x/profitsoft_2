@@ -9,6 +9,7 @@ import com.ykotsiuba.profitsoft_2.mapper.AuthorMapper;
 import com.ykotsiuba.profitsoft_2.repository.ArticleRepository;
 import com.ykotsiuba.profitsoft_2.service.ArticleService;
 import com.ykotsiuba.profitsoft_2.service.AuthorService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -64,7 +65,7 @@ public class ArticleServiceImpl implements ArticleService {
     private Article findOrThrow(String id) {
         UUID uuid = UUID.fromString(id);
         Optional<Article> optionalAuthor = articleRepository.findById(uuid);
-        return optionalAuthor.orElseThrow(() -> new IllegalArgumentException(String.format(ARTICLE_NOT_FOUND, id)));
+        return optionalAuthor.orElseThrow(() -> new EntityNotFoundException(String.format(ARTICLE_NOT_FOUND, id)));
     }
 
     @Override
