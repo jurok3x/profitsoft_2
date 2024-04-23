@@ -45,6 +45,12 @@ class ArticleControllerTest {
 
     private static final ObjectMapper DEFAULT_MAPPER;
 
+    private static final String API_URL = "/articles";
+
+    private static final String ID ="00000000-0000-0000-0000-000000000001";
+
+    private static final String ID_URL = API_URL + "/%s";
+
     static {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -62,9 +68,7 @@ class ArticleControllerTest {
 
     @Test
     public void testGetArticle() throws Exception {
-        String id = "00000000-0000-0000-0000-000000000001";
-        String url = String.format("/articles/%s", id);
-        MvcResult mvcResult = mvc.perform(get(url))
+        MvcResult mvcResult = mvc.perform(get(String.format(ID_URL, ID)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -76,26 +80,24 @@ class ArticleControllerTest {
 
     @Test
     public void testGetArticle_notFound() throws Exception {
-        String id = "00000000-0000-0000-0000-000000000099";
-        String url = String.format("/articles/%s", id);
-        MvcResult mvcResult = mvc.perform(get(url))
+        String errorId = "00000000-0000-0000-0000-000000000099";
+        MvcResult mvcResult = mvc.perform(get(String.format(ID_URL, errorId)))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         String response = mvcResult.getResponse().getContentAsString();
         APIException responseDTO = DEFAULT_MAPPER.readValue(response, APIException.class);
-        assertEquals(String.format("Article not found for ID: %s", id), responseDTO.getErrors().get(0));
+        assertEquals(String.format("Article not found for ID: %s", errorId), responseDTO.getErrors().get(0));
     }
 
     @Test
     @Transactional
     public void testSaveArticle() throws Exception {
-        String url = "/articles";
         SaveArticleRequestDTO saveArticleRequestDTO = prepareSaveRequest();
         String body = DEFAULT_MAPPER.writeValueAsString(saveArticleRequestDTO);
 
-        MvcResult mvcResult = mvc.perform(post(url)
+        MvcResult mvcResult = mvc.perform(post(API_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body)
                 )
@@ -109,19 +111,18 @@ class ArticleControllerTest {
         assertNotNull(id);
 
         Optional<Article> byId = articleRepository.findById(id);
-        assertNotNull(byId.get());
+        assertFalse(byId.isEmpty());
     }
 
     @Test
     @Transactional
-    public void testSaveArticle_Error() throws Exception {
-        String url = "/articles";
+    public void testSaveArticle_invalidParameters() throws Exception {
         SaveArticleRequestDTO saveArticleRequestDTO = prepareSaveRequest();
         saveArticleRequestDTO.setTitle(null);
         saveArticleRequestDTO.setJournal(null);
         String body = DEFAULT_MAPPER.writeValueAsString(saveArticleRequestDTO);
 
-        MvcResult mvcResult = mvc.perform(post(url)
+        MvcResult mvcResult = mvc.perform(post(API_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body)
                 )
@@ -137,12 +138,10 @@ class ArticleControllerTest {
     @Test
     @Transactional
     public void testUpdateArticle() throws Exception {
-        String id = "00000000-0000-0000-0000-000000000001";
-        String url = String.format("/articles/%s", id);
         SaveArticleRequestDTO updateArticleRequestDTO = prepareSaveRequest();
         String body = DEFAULT_MAPPER.writeValueAsString(updateArticleRequestDTO);
 
-        MvcResult mvcResult = mvc.perform(put(url)
+        MvcResult mvcResult = mvc.perform(put(String.format(ID_URL, ID))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body)
                 )
@@ -154,7 +153,7 @@ class ArticleControllerTest {
         ArticleDTO responseDTO = DEFAULT_MAPPER.readValue(response, ArticleDTO.class);
         assertEquals(updateArticleRequestDTO.getTitle(), responseDTO.getTitle());
 
-        Optional<Article> byId = articleRepository.findById(UUID.fromString(id));
+        Optional<Article> byId = articleRepository.findById(UUID.fromString(ID));
         assertFalse(byId.isEmpty());
         Article article = byId.get();
         assertEquals(updateArticleRequestDTO.getTitle(), article.getTitle());
@@ -163,9 +162,7 @@ class ArticleControllerTest {
     @Test
     @Transactional
     public void testDeleteArticle() throws Exception {
-        String id = "00000000-0000-0000-0000-000000000001";
-        String url = String.format("/articles/%s", id);
-        MvcResult mvcResult = mvc.perform(delete(url))
+        MvcResult mvcResult = mvc.perform(delete(String.format(ID_URL, ID)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -174,7 +171,7 @@ class ArticleControllerTest {
         DeleteArticleResponseDTO responseDTO = DEFAULT_MAPPER.readValue(response, DeleteArticleResponseDTO.class);
         assertEquals("Article deleted successfully.", responseDTO.getMessage());
 
-        Optional<Article> byId = articleRepository.findById(UUID.fromString(id));
+        Optional<Article> byId = articleRepository.findById(UUID.fromString(ID));
         assertTrue(byId.isEmpty());
     }
 
