@@ -1,6 +1,7 @@
 package com.ykotsiuba.profitsoft_2.controller;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -8,11 +9,11 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ykotsiuba.profitsoft_2.Profitsoft2Application;
 import com.ykotsiuba.profitsoft_2.TestProfitsoft2Application;
 import com.ykotsiuba.profitsoft_2.dto.APIException;
-import com.ykotsiuba.profitsoft_2.dto.ArticleDTO;
-import com.ykotsiuba.profitsoft_2.dto.DeleteArticleResponseDTO;
-import com.ykotsiuba.profitsoft_2.dto.SaveArticleRequestDTO;
-import com.ykotsiuba.profitsoft_2.entity.Article;
-import com.ykotsiuba.profitsoft_2.repository.ArticleRepository;
+import com.ykotsiuba.profitsoft_2.dto.AuthorDTO;
+import com.ykotsiuba.profitsoft_2.dto.DeleteAuthorResponseDTO;
+import com.ykotsiuba.profitsoft_2.dto.SaveAuthorRequestDTO;
+import com.ykotsiuba.profitsoft_2.entity.Author;
+import com.ykotsiuba.profitsoft_2.repository.AuthorRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -41,11 +43,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestProfitsoft2Application.class)
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-class ArticleControllerTest {
+class AuthorControllerTest {
 
     private static final ObjectMapper DEFAULT_MAPPER;
+    private static final int INITIAL_AUTHOR_COUNT = 10;
 
-    private static final String API_URL = "/articles";
+    private static final String API_URL = "/authors";
 
     private static final String ID ="00000000-0000-0000-0000-000000000001";
 
@@ -64,38 +67,28 @@ class ArticleControllerTest {
     private MockMvc mvc;
 
     @Autowired
-    private ArticleRepository articleRepository;
+    private AuthorRepository authorRepository;
 
     @Test
-    public void testGetArticle() throws Exception {
-        MvcResult mvcResult = mvc.perform(get(String.format(ID_URL, ID)))
+    public void testGetAuthors() throws Exception {
+        MvcResult mvcResult = mvc.perform(get(API_URL))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         String response = mvcResult.getResponse().getContentAsString();
-        ArticleDTO responseDTO = DEFAULT_MAPPER.readValue(response, ArticleDTO.class);
-        assertEquals("Physics Today", responseDTO.getJournal());
-    }
+        List<AuthorDTO> responseDTO = DEFAULT_MAPPER.readValue(response, new TypeReference<List<AuthorDTO>>() {});
+        assertEquals(INITIAL_AUTHOR_COUNT, responseDTO.size());
 
-    @Test
-    public void testGetArticle_notFound() throws Exception {
-        String errorId = "00000000-0000-0000-0000-000000000099";
-        MvcResult mvcResult = mvc.perform(get(String.format(ID_URL, errorId)))
-                .andExpect(status().isNotFound())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andReturn();
-
-        String response = mvcResult.getResponse().getContentAsString();
-        APIException responseDTO = DEFAULT_MAPPER.readValue(response, APIException.class);
-        assertEquals(String.format("Article not found for ID: %s", errorId), responseDTO.getErrors().get(0));
+        List<Author> authors = authorRepository.findAll();
+        assertEquals(INITIAL_AUTHOR_COUNT, authors.size());
     }
 
     @Test
     @Transactional
-    public void testSaveArticle() throws Exception {
-        SaveArticleRequestDTO saveArticleRequestDTO = prepareSaveRequest();
-        String body = DEFAULT_MAPPER.writeValueAsString(saveArticleRequestDTO);
+    public void testSaveAuthor() throws Exception {
+        SaveAuthorRequestDTO saveAuthorRequestDTO = prepareSaveRequest();
+        String body = DEFAULT_MAPPER.writeValueAsString(saveAuthorRequestDTO);
 
         MvcResult mvcResult = mvc.perform(post(API_URL)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -106,21 +99,21 @@ class ArticleControllerTest {
                 .andReturn();
 
         String response = mvcResult.getResponse().getContentAsString();
-        ArticleDTO responseDTO = DEFAULT_MAPPER.readValue(response, ArticleDTO.class);
+        AuthorDTO responseDTO = DEFAULT_MAPPER.readValue(response, AuthorDTO.class);
         UUID id = responseDTO.getId();
         assertNotNull(id);
 
-        Optional<Article> byId = articleRepository.findById(id);
+        Optional<Author> byId = authorRepository.findById(id);
         assertFalse(byId.isEmpty());
     }
 
     @Test
     @Transactional
-    public void testSaveArticle_invalidParameters() throws Exception {
-        SaveArticleRequestDTO saveArticleRequestDTO = prepareSaveRequest();
-        saveArticleRequestDTO.setTitle(null);
-        saveArticleRequestDTO.setJournal(null);
-        String body = DEFAULT_MAPPER.writeValueAsString(saveArticleRequestDTO);
+    public void testSaveAuthor_invalidParameters() throws Exception {
+        SaveAuthorRequestDTO saveAuthorRequestDTO = prepareSaveRequest();
+        saveAuthorRequestDTO.setFirstName(null);
+        saveAuthorRequestDTO.setLastName(null);
+        String body = DEFAULT_MAPPER.writeValueAsString(saveAuthorRequestDTO);
 
         MvcResult mvcResult = mvc.perform(post(API_URL)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -130,16 +123,16 @@ class ArticleControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-          String response = mvcResult.getResponse().getContentAsString();
-          APIException responseDTO = DEFAULT_MAPPER.readValue(response, APIException.class);
-          assertEquals(2, responseDTO.getErrors().size());
+        String response = mvcResult.getResponse().getContentAsString();
+        APIException responseDTO = DEFAULT_MAPPER.readValue(response, APIException.class);
+        assertEquals(2, responseDTO.getErrors().size());
     }
 
     @Test
     @Transactional
-    public void testUpdateArticle() throws Exception {
-        SaveArticleRequestDTO updateArticleRequestDTO = prepareSaveRequest();
-        String body = DEFAULT_MAPPER.writeValueAsString(updateArticleRequestDTO);
+    public void testUpdateAuthor() throws Exception {
+        SaveAuthorRequestDTO updateAuthorRequestDTO = prepareSaveRequest();
+        String body = DEFAULT_MAPPER.writeValueAsString(updateAuthorRequestDTO);
 
         MvcResult mvcResult = mvc.perform(put(String.format(ID_URL, ID))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -150,39 +143,35 @@ class ArticleControllerTest {
                 .andReturn();
 
         String response = mvcResult.getResponse().getContentAsString();
-        ArticleDTO responseDTO = DEFAULT_MAPPER.readValue(response, ArticleDTO.class);
-        assertEquals(updateArticleRequestDTO.getTitle(), responseDTO.getTitle());
+        AuthorDTO responseDTO = DEFAULT_MAPPER.readValue(response, AuthorDTO.class);
+        assertEquals(updateAuthorRequestDTO.getFirstName(), responseDTO.getFirstName());
 
-        Optional<Article> byId = articleRepository.findById(UUID.fromString(ID));
+        Optional<Author> byId = authorRepository.findById(UUID.fromString(ID));
         assertFalse(byId.isEmpty());
-        Article article = byId.get();
-        assertEquals(updateArticleRequestDTO.getTitle(), article.getTitle());
+        Author author = byId.get();
+        assertEquals(updateAuthorRequestDTO.getFirstName(), author.getFirstName());
     }
 
     @Test
     @Transactional
-    public void testDeleteArticle() throws Exception {
+    public void testDeleteAuthor() throws Exception {
         MvcResult mvcResult = mvc.perform(delete(String.format(ID_URL, ID)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         String response = mvcResult.getResponse().getContentAsString();
-        DeleteArticleResponseDTO responseDTO = DEFAULT_MAPPER.readValue(response, DeleteArticleResponseDTO.class);
-        assertEquals("Article deleted successfully.", responseDTO.getMessage());
+        DeleteAuthorResponseDTO responseDTO = DEFAULT_MAPPER.readValue(response, DeleteAuthorResponseDTO.class);
+        assertEquals("Author deleted successfully.", responseDTO.getMessage());
 
-        Optional<Article> byId = articleRepository.findById(UUID.fromString(ID));
+        Optional<Author> byId = authorRepository.findById(UUID.fromString(ID));
         assertTrue(byId.isEmpty());
     }
 
-    private SaveArticleRequestDTO prepareSaveRequest() {
-        return SaveArticleRequestDTO.builder()
-                .title("Lasers in our world")
-                .authorId("00000000-0000-0000-0000-000000000001")
-                .field("PHYSICS")
-                .journal("Applied optics")
-                .year(2001)
+    private SaveAuthorRequestDTO prepareSaveRequest() {
+        return SaveAuthorRequestDTO.builder()
+                .firstName("Keanu")
+                .lastName("Reeves")
                 .build();
     }
-
 }
