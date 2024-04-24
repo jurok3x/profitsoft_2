@@ -19,6 +19,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.ykotsiuba.profitsoft_2.entity.enums.AuthorMessages.AUTHOR_DELETED;
+import static com.ykotsiuba.profitsoft_2.utils.EntitySource.prepareAuthor;
+import static com.ykotsiuba.profitsoft_2.utils.EntitySource.prepareSaveAuthorRequest;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -67,15 +69,6 @@ class AuthorServiceImplTest {
         verify(authorRepository).findById(any(UUID.class));
     }
 
-    private Author prepareAuthor() {
-        return Author.builder()
-                .id(UUID.randomUUID())
-                .email("kreeves@example.com")
-                .firstName("Keanu")
-                .lastName("Reeves")
-                .build();
-    }
-
     @Test
     void whenFindByEmail_thenReturnCorrectAuthor() {
         Author author = prepareAuthor();
@@ -101,7 +94,7 @@ class AuthorServiceImplTest {
     @Test
     void whenSave_thenReturnCorrectAuthor() {
         Author author = prepareAuthor();
-        SaveAuthorRequestDTO requestDTO = prepareSaveRequest();
+        SaveAuthorRequestDTO requestDTO = prepareSaveAuthorRequest();
         when(authorRepository.save(any(Author.class))).thenReturn(author);
         when(authorRepository.findByEmail(any(String.class))).thenReturn(Optional.empty());
 
@@ -113,18 +106,10 @@ class AuthorServiceImplTest {
         verify(authorRepository).save(any(Author.class));
     }
 
-    private SaveAuthorRequestDTO prepareSaveRequest() {
-        return SaveAuthorRequestDTO.builder()
-                .firstName("Keanu")
-                .lastName("Reeves")
-                .email("kreeves@example.com")
-                .build();
-    }
-
     @Test
     void whenSaveAuthorWithExistingEmail_thenThrowError() {
         Author author = prepareAuthor();
-        SaveAuthorRequestDTO requestDTO = prepareSaveRequest();
+        SaveAuthorRequestDTO requestDTO = prepareSaveAuthorRequest();
         when(authorRepository.findByEmail(any(String.class))).thenReturn(Optional.of(author));
 
         assertThrows(IllegalArgumentException.class, () -> authorService.save(requestDTO));
@@ -135,7 +120,7 @@ class AuthorServiceImplTest {
     @Test
     void whenUpdate_thenReturnCorrectAuthor() {
         Author author = prepareAuthor();
-        SaveAuthorRequestDTO requestDTO = prepareSaveRequest();
+        SaveAuthorRequestDTO requestDTO = prepareSaveAuthorRequest();
         when(authorRepository.save(any(Author.class))).thenReturn(author);
         when(authorRepository.findById(any(UUID.class))).thenReturn(Optional.of(author));
         when(authorRepository.findByEmail(any(String.class))).thenReturn(Optional.empty());
@@ -155,7 +140,7 @@ class AuthorServiceImplTest {
         Author author = prepareAuthor();
         Author anotherAuthor = prepareAuthor();
         anotherAuthor.setEmail(existingEmail);
-        SaveAuthorRequestDTO requestDTO = prepareSaveRequest();
+        SaveAuthorRequestDTO requestDTO = prepareSaveAuthorRequest();
         requestDTO.setEmail(existingEmail);
         when(authorRepository.findById(any(UUID.class))).thenReturn(Optional.of(author));
         when(authorRepository.findByEmail(any(String.class))).thenReturn(Optional.of(anotherAuthor));

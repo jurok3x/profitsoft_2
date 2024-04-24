@@ -3,7 +3,6 @@ package com.ykotsiuba.profitsoft_2.service.impl;
 import com.ykotsiuba.profitsoft_2.dto.*;
 import com.ykotsiuba.profitsoft_2.entity.Article;
 import com.ykotsiuba.profitsoft_2.entity.Author;
-import com.ykotsiuba.profitsoft_2.entity.enums.Field;
 import com.ykotsiuba.profitsoft_2.mapper.ArticleMapper;
 import com.ykotsiuba.profitsoft_2.mapper.ArticleMapperImpl;
 import com.ykotsiuba.profitsoft_2.mapper.AuthorMapper;
@@ -16,16 +15,14 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static com.ykotsiuba.profitsoft_2.entity.enums.ArticleMessages.ARTICLE_DELETED;
+import static com.ykotsiuba.profitsoft_2.utils.EntitySource.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -72,16 +69,6 @@ class ArticleServiceImplTest {
         verify(authorService).findById(any(String.class));
     }
 
-    private SaveArticleRequestDTO prepareSaveArticleRequest() {
-        return SaveArticleRequestDTO.builder()
-                .title("Lasers in our world")
-                .authorId(UUID.randomUUID().toString())
-                .field(Field.PHYSICS.name())
-                .journal("Applied optics")
-                .year(2001)
-                .build();
-    }
-
     @Test
     void whenAuthorNotFound_thenThrowException() {
         SaveArticleRequestDTO requestDTO = prepareSaveArticleRequest();
@@ -103,26 +90,6 @@ class ArticleServiceImplTest {
         assertNotNull(responseDTO);
         assertEquals(article.getField(), responseDTO.getField());
         verify(articleRepository).findById(any(UUID.class));
-    }
-
-    private Article prepareArticle() {
-        return Article.builder()
-                .id(UUID.randomUUID())
-                .title("Lasers in our world")
-                .author(prepareAuthor())
-                .field(Field.PHYSICS)
-                .journal("Applied optics")
-                .year(2001)
-                .build();
-    }
-
-    private Author prepareAuthor() {
-        return Author.builder()
-                .id(UUID.randomUUID())
-                .email("johndoe@mail.com")
-                .firstName("John")
-                .lastName("Doe")
-                .build();
     }
 
     @Test
@@ -189,23 +156,6 @@ class ArticleServiceImplTest {
         assertNotNull(responseDTO);
         assertFalse(responseDTO.getList().isEmpty());
         verify(articleRepository).search(any(SearchArticleRequestDTO.class), any(Pageable.class));
-    }
-
-    private SearchArticleRequestDTO prepareSearchRequest() {
-        return SearchArticleRequestDTO.builder()
-                .page(0)
-                .size(10)
-                .titlePart("quantum")
-                .authorId("00000000-0000-0000-0000-000000000001")
-                .field("PHYSICS")
-                .journal("Physics Today")
-                .year(2020)
-                .build();
-    }
-
-    private Page<Article> prepareTestPage(Pageable pageRequest) {
-        List<Article> articles = Arrays.asList(prepareArticle());
-        return new PageImpl<>(articles, pageRequest, articles.size());
     }
 
     @Test

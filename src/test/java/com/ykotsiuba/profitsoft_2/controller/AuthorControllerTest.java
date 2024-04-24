@@ -30,6 +30,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.ykotsiuba.profitsoft_2.entity.enums.AuthorMessages.*;
+import static com.ykotsiuba.profitsoft_2.utils.EntitySource.prepareSaveAuthorRequest;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -89,7 +90,7 @@ class AuthorControllerTest {
     @Test
     @Transactional
     public void testSaveAuthor() throws Exception {
-        SaveAuthorRequestDTO saveAuthorRequestDTO = prepareSaveRequest();
+        SaveAuthorRequestDTO saveAuthorRequestDTO = prepareSaveAuthorRequest();
         String body = DEFAULT_MAPPER.writeValueAsString(saveAuthorRequestDTO);
 
         MvcResult mvcResult = mvc.perform(post(API_URL)
@@ -112,7 +113,7 @@ class AuthorControllerTest {
     @Test
     @Transactional
     public void testSaveAuthor_invalidParameters() throws Exception {
-        SaveAuthorRequestDTO saveAuthorRequestDTO = prepareSaveRequest();
+        SaveAuthorRequestDTO saveAuthorRequestDTO = prepareSaveAuthorRequest();
         saveAuthorRequestDTO.setFirstName(null);
         saveAuthorRequestDTO.setLastName(null);
         String body = DEFAULT_MAPPER.writeValueAsString(saveAuthorRequestDTO);
@@ -134,7 +135,7 @@ class AuthorControllerTest {
     @Transactional
     public void testSaveAuthor_emailExists() throws Exception {
         String existingEmail = "john.doe@example.com";
-        SaveAuthorRequestDTO saveAuthorRequestDTO = prepareSaveRequest();
+        SaveAuthorRequestDTO saveAuthorRequestDTO = prepareSaveAuthorRequest();
         saveAuthorRequestDTO.setEmail(existingEmail);
         String body = DEFAULT_MAPPER.writeValueAsString(saveAuthorRequestDTO);
 
@@ -155,7 +156,7 @@ class AuthorControllerTest {
     @Test
     @Transactional
     public void testUpdateAuthor() throws Exception {
-        SaveAuthorRequestDTO updateAuthorRequestDTO = prepareSaveRequest();
+        SaveAuthorRequestDTO updateAuthorRequestDTO = prepareSaveAuthorRequest();
         String body = DEFAULT_MAPPER.writeValueAsString(updateAuthorRequestDTO);
 
         MvcResult mvcResult = mvc.perform(put(String.format(ID_URL, ID))
@@ -180,7 +181,7 @@ class AuthorControllerTest {
     @Transactional
     public void testUpdateAuthor_invalidEmail() throws Exception {
         String existingEmail = "jane.smith@example.com";
-        SaveAuthorRequestDTO updateAuthorRequestDTO = prepareSaveRequest();
+        SaveAuthorRequestDTO updateAuthorRequestDTO = prepareSaveAuthorRequest();
         updateAuthorRequestDTO.setEmail(existingEmail);
         String body = DEFAULT_MAPPER.writeValueAsString(updateAuthorRequestDTO);
 
@@ -214,11 +215,4 @@ class AuthorControllerTest {
         assertTrue(byId.isEmpty());
     }
 
-    private SaveAuthorRequestDTO prepareSaveRequest() {
-        return SaveAuthorRequestDTO.builder()
-                .firstName("Keanu")
-                .lastName("Reeves")
-                .email("kreeves@example.com")
-                .build();
-    }
 }
