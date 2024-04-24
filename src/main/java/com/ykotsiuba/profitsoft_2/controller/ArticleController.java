@@ -43,6 +43,6 @@ public class ArticleController {
     @PostMapping("/_list")
     public ResponseEntity<SearchArticlesResponseDTO> search(@RequestBody @Valid SearchArticleRequestDTO requestDTO) {
         SearchArticlesResponseDTO responseDTO = service.findBySearchParameters(requestDTO);
-        return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 }

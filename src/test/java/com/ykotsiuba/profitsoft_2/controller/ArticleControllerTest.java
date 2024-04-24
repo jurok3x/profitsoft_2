@@ -7,10 +7,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ykotsiuba.profitsoft_2.Profitsoft2Application;
 import com.ykotsiuba.profitsoft_2.TestProfitsoft2Application;
-import com.ykotsiuba.profitsoft_2.dto.APIException;
-import com.ykotsiuba.profitsoft_2.dto.ArticleDTO;
-import com.ykotsiuba.profitsoft_2.dto.DeleteArticleResponseDTO;
-import com.ykotsiuba.profitsoft_2.dto.SaveArticleRequestDTO;
+import com.ykotsiuba.profitsoft_2.dto.*;
 import com.ykotsiuba.profitsoft_2.entity.Article;
 import com.ykotsiuba.profitsoft_2.repository.ArticleRepository;
 import jakarta.transaction.Transactional;
@@ -50,6 +47,8 @@ class ArticleControllerTest {
     private static final String ID ="00000000-0000-0000-0000-000000000001";
 
     private static final String ID_URL = API_URL + "/%s";
+
+    private static final String SEARCH_URL = API_URL + "/_list";
 
     static {
         ObjectMapper mapper = new ObjectMapper();
@@ -175,6 +174,43 @@ class ArticleControllerTest {
         assertTrue(byId.isEmpty());
     }
 
+    @Test
+    public void testSearchArticles() throws Exception {
+        SearchArticleRequestDTO requestDTO = prepareSearchRequest();
+        String body = DEFAULT_MAPPER.writeValueAsString(requestDTO);
+
+        MvcResult mvcResult = mvc.perform(post(SEARCH_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        String response = mvcResult.getResponse().getContentAsString();
+        SearchArticlesResponseDTO responseDTO = DEFAULT_MAPPER.readValue(response, SearchArticlesResponseDTO.class);
+        assertFalse(responseDTO.getList().isEmpty());
+    }
+
+    @Test
+    public void testSearchArticles_invalidPaging() throws Exception {
+        SearchArticleRequestDTO requestDTO = prepareSearchRequest();
+        requestDTO.setPage(null);
+        String body = DEFAULT_MAPPER.writeValueAsString(requestDTO);
+
+        MvcResult mvcResult = mvc.perform(post(SEARCH_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        String response = mvcResult.getResponse().getContentAsString();
+        APIException responseDTO = DEFAULT_MAPPER.readValue(response, APIException.class);
+        assertEquals(1, responseDTO.getErrors().size());
+    }
+
     private SaveArticleRequestDTO prepareSaveRequest() {
         return SaveArticleRequestDTO.builder()
                 .title("Lasers in our world")
@@ -185,4 +221,15 @@ class ArticleControllerTest {
                 .build();
     }
 
+    private SearchArticleRequestDTO prepareSearchRequest() {
+        return SearchArticleRequestDTO.builder()
+                .page(0)
+                .size(10)
+                .titlePart("quantum")
+                .authorId("00000000-0000-0000-0000-000000000001")
+                .field("PHYSICS")
+                .journal("Physics Today")
+                .year(2020)
+                .build();
+    }
 }
