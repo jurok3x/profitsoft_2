@@ -26,6 +26,8 @@ import java.util.UUID;
 
 import static com.ykotsiuba.profitsoft_2.entity.enums.ArticleMessages.ARTICLE_DELETED;
 import static com.ykotsiuba.profitsoft_2.entity.enums.ArticleMessages.ARTICLE_NOT_FOUND;
+import static com.ykotsiuba.profitsoft_2.utils.EntitySource.prepareSaveArticleRequest;
+import static com.ykotsiuba.profitsoft_2.utils.EntitySource.prepareSearchRequest;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -95,7 +97,7 @@ class ArticleControllerTest {
     @Test
     @Transactional
     public void testSaveArticle() throws Exception {
-        SaveArticleRequestDTO saveArticleRequestDTO = prepareSaveRequest();
+        SaveArticleRequestDTO saveArticleRequestDTO = prepareSaveArticleRequest();
         String body = DEFAULT_MAPPER.writeValueAsString(saveArticleRequestDTO);
 
         MvcResult mvcResult = mvc.perform(post(API_URL)
@@ -118,7 +120,7 @@ class ArticleControllerTest {
     @Test
     @Transactional
     public void testSaveArticle_invalidParameters() throws Exception {
-        SaveArticleRequestDTO saveArticleRequestDTO = prepareSaveRequest();
+        SaveArticleRequestDTO saveArticleRequestDTO = prepareSaveArticleRequest();
         saveArticleRequestDTO.setTitle(null);
         saveArticleRequestDTO.setJournal(null);
         String body = DEFAULT_MAPPER.writeValueAsString(saveArticleRequestDTO);
@@ -139,7 +141,7 @@ class ArticleControllerTest {
     @Test
     @Transactional
     public void testUpdateArticle() throws Exception {
-        SaveArticleRequestDTO updateArticleRequestDTO = prepareSaveRequest();
+        SaveArticleRequestDTO updateArticleRequestDTO = prepareSaveArticleRequest();
         String body = DEFAULT_MAPPER.writeValueAsString(updateArticleRequestDTO);
 
         MvcResult mvcResult = mvc.perform(put(String.format(ID_URL, ID))
@@ -211,27 +213,5 @@ class ArticleControllerTest {
         String response = mvcResult.getResponse().getContentAsString();
         APIException responseDTO = DEFAULT_MAPPER.readValue(response, APIException.class);
         assertEquals(1, responseDTO.getErrors().size());
-    }
-
-    private SaveArticleRequestDTO prepareSaveRequest() {
-        return SaveArticleRequestDTO.builder()
-                .title("Lasers in our world")
-                .authorId("00000000-0000-0000-0000-000000000001")
-                .field("PHYSICS")
-                .journal("Applied optics")
-                .year(2001)
-                .build();
-    }
-
-    private SearchArticleRequestDTO prepareSearchRequest() {
-        return SearchArticleRequestDTO.builder()
-                .page(0)
-                .size(10)
-                .titlePart("quantum")
-                .authorId("00000000-0000-0000-0000-000000000001")
-                .field("PHYSICS")
-                .journal("Physics Today")
-                .year(2020)
-                .build();
     }
 }
