@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.ykotsiuba.profitsoft_2.entity.enums.AuthorMessages.AUTHOR_DELETED;
+import static com.ykotsiuba.profitsoft_2.entity.enums.AuthorMessages.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -48,6 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AuthorControllerTest {
 
     private static final ObjectMapper DEFAULT_MAPPER;
+
     private static final int INITIAL_AUTHOR_COUNT = 10;
 
     private static final String API_URL = "/authors";
@@ -133,9 +134,9 @@ class AuthorControllerTest {
     @Test
     @Transactional
     public void testSaveAuthor_emailExists() throws Exception {
+        String existingEmail = "john.doe@example.com";
         SaveAuthorRequestDTO saveAuthorRequestDTO = prepareSaveRequest();
-        saveAuthorRequestDTO.setFirstName(null);
-        saveAuthorRequestDTO.setLastName(null);
+        saveAuthorRequestDTO.setEmail(existingEmail);
         String body = DEFAULT_MAPPER.writeValueAsString(saveAuthorRequestDTO);
 
         MvcResult mvcResult = mvc.perform(post(API_URL)
@@ -148,7 +149,8 @@ class AuthorControllerTest {
 
         String response = mvcResult.getResponse().getContentAsString();
         APIException responseDTO = DEFAULT_MAPPER.readValue(response, APIException.class);
-        //todo implement
+        String error = responseDTO.getErrors().get(0);
+        assertEquals(String.format(AUTHOR_ALREADY_EXISTS.getMessage(), existingEmail), error);
     }
 
     @Test
@@ -178,21 +180,23 @@ class AuthorControllerTest {
     @Test
     @Transactional
     public void testUpdateAuthor_invalidEmail() throws Exception {
+        String existingEmail = "jane.smith@example.com";
         SaveAuthorRequestDTO updateAuthorRequestDTO = prepareSaveRequest();
+        updateAuthorRequestDTO.setEmail(existingEmail);
         String body = DEFAULT_MAPPER.writeValueAsString(updateAuthorRequestDTO);
 
         MvcResult mvcResult = mvc.perform(put(String.format(ID_URL, ID))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body)
                 )
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         String response = mvcResult.getResponse().getContentAsString();
-        AuthorDTO responseDTO = DEFAULT_MAPPER.readValue(response, AuthorDTO.class);
-        assertEquals(updateAuthorRequestDTO.getFirstName(), responseDTO.getFirstName());
-        //todo implement
+        APIException responseDTO = DEFAULT_MAPPER.readValue(response, APIException.class);
+        String error = responseDTO.getErrors().get(0);
+        assertEquals(String.format(AUTHOR_UPDATE_ERROR.getMessage(), existingEmail), error);
     }
 
     @Test
@@ -215,6 +219,7 @@ class AuthorControllerTest {
         return SaveAuthorRequestDTO.builder()
                 .firstName("Keanu")
                 .lastName("Reeves")
+                .email("kreeves@example.com")
                 .build();
     }
 }
