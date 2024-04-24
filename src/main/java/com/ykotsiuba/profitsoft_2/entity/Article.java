@@ -1,5 +1,6 @@
 package com.ykotsiuba.profitsoft_2.entity;
 
+import com.ykotsiuba.profitsoft_2.entity.enums.Field;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

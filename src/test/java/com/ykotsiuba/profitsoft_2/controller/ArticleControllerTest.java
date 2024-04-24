@@ -24,6 +24,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.ykotsiuba.profitsoft_2.entity.enums.ArticleMessages.ARTICLE_DELETED;
+import static com.ykotsiuba.profitsoft_2.entity.enums.ArticleMessages.ARTICLE_NOT_FOUND;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -87,7 +89,7 @@ class ArticleControllerTest {
 
         String response = mvcResult.getResponse().getContentAsString();
         APIException responseDTO = DEFAULT_MAPPER.readValue(response, APIException.class);
-        assertEquals(String.format("Article not found for ID: %s", invalidId), responseDTO.getErrors().get(0));
+        assertEquals(String.format(ARTICLE_NOT_FOUND.getMessage(), invalidId), responseDTO.getErrors().get(0));
     }
 
     @Test
@@ -168,7 +170,7 @@ class ArticleControllerTest {
 
         String response = mvcResult.getResponse().getContentAsString();
         DeleteArticleResponseDTO responseDTO = DEFAULT_MAPPER.readValue(response, DeleteArticleResponseDTO.class);
-        assertEquals("Article deleted successfully.", responseDTO.getMessage());
+        assertEquals(ARTICLE_DELETED.getMessage(), responseDTO.getMessage());
 
         Optional<Article> byId = articleRepository.findById(UUID.fromString(ID));
         assertTrue(byId.isEmpty());
