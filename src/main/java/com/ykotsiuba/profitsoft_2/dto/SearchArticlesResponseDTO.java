@@ -12,6 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SearchArticlesResponseDTO {
+
     private List<ArticleResponseDTO> list;
 
     private Integer totalPages;

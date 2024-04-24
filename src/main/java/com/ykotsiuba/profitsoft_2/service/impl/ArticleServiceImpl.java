@@ -12,9 +12,13 @@ import com.ykotsiuba.profitsoft_2.service.AuthorService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -88,7 +92,16 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public SearchArticlesResponseDTO findBySearchParameters(SearchArticleRequestDTO requestDTO) {
-        return null;
+        Pageable pageable = PageRequest.of(requestDTO.getPage(), requestDTO.getSize());
+        Page<Article> articlePage = articleRepository.search(requestDTO, pageable);
+        int totalPages = articlePage.getTotalPages();
+        List<ArticleResponseDTO> list = articlePage.get()
+                .map(articleMapper::toResponseDTO)
+                .toList();
+        return SearchArticlesResponseDTO.builder()
+                .list(list)
+                .totalPages(totalPages)
+                .build();
     }
 
     @Override
