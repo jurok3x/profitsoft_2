@@ -1,7 +1,7 @@
 package com.ykotsiuba.profitsoft_2.mapper;
 
-import com.ykotsiuba.profitsoft_2.dto.ArticleDTO;
-import com.ykotsiuba.profitsoft_2.dto.ArticleResponseDTO;
+import com.ykotsiuba.profitsoft_2.dto.article.ArticleDTO;
+import com.ykotsiuba.profitsoft_2.dto.article.ArticleResponseDTO;
 import com.ykotsiuba.profitsoft_2.entity.Article;
 import com.ykotsiuba.profitsoft_2.entity.Author;
 import org.mapstruct.Mapper;

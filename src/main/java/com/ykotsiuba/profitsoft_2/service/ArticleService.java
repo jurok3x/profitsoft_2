@@ -1,6 +1,6 @@
 package com.ykotsiuba.profitsoft_2.service;
 
-import com.ykotsiuba.profitsoft_2.dto.*;
+import com.ykotsiuba.profitsoft_2.dto.article.*;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.multipart.MultipartFile;
 

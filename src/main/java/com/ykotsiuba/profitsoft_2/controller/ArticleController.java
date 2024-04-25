@@ -1,6 +1,6 @@
 package com.ykotsiuba.profitsoft_2.controller;
 
-import com.ykotsiuba.profitsoft_2.dto.*;
+import com.ykotsiuba.profitsoft_2.dto.article.*;
 import com.ykotsiuba.profitsoft_2.service.ArticleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

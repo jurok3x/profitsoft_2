@@ -1,6 +1,7 @@
 package com.ykotsiuba.profitsoft_2.service.impl;
 
-import com.ykotsiuba.profitsoft_2.dto.*;
+import com.ykotsiuba.profitsoft_2.dto.article.*;
+import com.ykotsiuba.profitsoft_2.dto.author.AuthorDTO;
 import com.ykotsiuba.profitsoft_2.entity.Article;
 import com.ykotsiuba.profitsoft_2.entity.Author;
 import com.ykotsiuba.profitsoft_2.entity.enums.Field;

@@ -1,6 +1,6 @@
 package com.ykotsiuba.profitsoft_2.repository;
 
-import com.ykotsiuba.profitsoft_2.dto.SearchArticleRequestDTO;
+import com.ykotsiuba.profitsoft_2.dto.article.SearchArticleRequestDTO;
 import com.ykotsiuba.profitsoft_2.entity.Article;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

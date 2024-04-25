@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ykotsiuba.profitsoft_2.Profitsoft2Application;
 import com.ykotsiuba.profitsoft_2.TestProfitsoft2Application;
 import com.ykotsiuba.profitsoft_2.dto.*;
+import com.ykotsiuba.profitsoft_2.dto.article.*;
 import com.ykotsiuba.profitsoft_2.entity.Article;
 import com.ykotsiuba.profitsoft_2.repository.ArticleRepository;
 import jakarta.transaction.Transactional;
