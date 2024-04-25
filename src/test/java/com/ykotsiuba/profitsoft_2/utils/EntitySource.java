@@ -1,8 +1,8 @@
 package com.ykotsiuba.profitsoft_2.utils;
 
 import com.ykotsiuba.profitsoft_2.dto.article.SaveArticleRequestDTO;
-import com.ykotsiuba.profitsoft_2.dto.author.SaveAuthorRequestDTO;
 import com.ykotsiuba.profitsoft_2.dto.article.SearchArticleRequestDTO;
+import com.ykotsiuba.profitsoft_2.dto.author.SaveAuthorRequestDTO;
 import com.ykotsiuba.profitsoft_2.entity.Article;
 import com.ykotsiuba.profitsoft_2.entity.Author;
 import com.ykotsiuba.profitsoft_2.entity.enums.Field;
