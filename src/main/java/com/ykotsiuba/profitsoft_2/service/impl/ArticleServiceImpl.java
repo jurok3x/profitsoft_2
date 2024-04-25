@@ -10,15 +10,22 @@ import com.ykotsiuba.profitsoft_2.mapper.AuthorMapper;
 import com.ykotsiuba.profitsoft_2.repository.ArticleRepository;
 import com.ykotsiuba.profitsoft_2.service.ArticleService;
 import com.ykotsiuba.profitsoft_2.service.AuthorService;
+import com.ykotsiuba.profitsoft_2.service.ReportGenerationService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,6 +37,9 @@ import static com.ykotsiuba.profitsoft_2.entity.enums.ArticleMessages.ARTICLE_NO
 @RequiredArgsConstructor
 public class ArticleServiceImpl implements ArticleService {
 
+    @Value("${file.location}")
+    private String excelFileLocation;
+
     private final ArticleRepository articleRepository;
 
     private final AuthorService authorService;
@@ -37,6 +47,8 @@ public class ArticleServiceImpl implements ArticleService {
     private final ArticleMapper articleMapper;
 
     private final AuthorMapper authorMapper;
+
+    private final ReportGenerationService reportService;
 
     @Override
     public ArticleDTO save(SaveArticleRequestDTO requestDTO) {
@@ -105,8 +117,21 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public void generateReport(HttpServletResponse response) {
+    public void generateReport(ReportArticlesRequestDTO requestDTO, HttpServletResponse response) {
+        List<Article> articles = articleRepository.report(requestDTO);
+        List<ArticleResponseDTO> report = articles.stream()
+                .map(articleMapper::toResponseDTO)
+                .toList();
+        reportService.writeReport(report);
 
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=articles.xlsx");
+        try {
+            response.getOutputStream().write(Files.readAllBytes(Paths.get(excelFileLocation)));
+            response.getOutputStream().flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

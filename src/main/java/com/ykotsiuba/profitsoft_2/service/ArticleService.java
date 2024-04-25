@@ -50,7 +50,7 @@ public interface ArticleService {
      */
     SearchArticlesResponseDTO findBySearchParameters(SearchArticleRequestDTO requestDTO);
 
-    void generateReport(HttpServletResponse response);
+    void generateReport(ReportArticlesRequestDTO requestDTO, HttpServletResponse response);
 
     UploadArticlesResponseDTO upload(MultipartFile file);
 }
