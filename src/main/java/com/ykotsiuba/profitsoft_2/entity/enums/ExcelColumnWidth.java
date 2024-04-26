@@ -6,7 +6,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 public enum ExcelColumnWidth {
-    SMALL(1000),
+    TINY(1000),
+    SMALL(2000),
     MEDIUM(4000),
     BIG(10000);
 
