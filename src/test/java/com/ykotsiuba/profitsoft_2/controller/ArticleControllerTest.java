@@ -14,28 +14,30 @@ import com.ykotsiuba.profitsoft_2.repository.ArticleRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.UUID;
 
 import static com.ykotsiuba.profitsoft_2.entity.enums.ArticleMessages.ARTICLE_DELETED;
 import static com.ykotsiuba.profitsoft_2.entity.enums.ArticleMessages.ARTICLE_NOT_FOUND;
-import static com.ykotsiuba.profitsoft_2.utils.EntitySource.prepareSaveArticleRequest;
-import static com.ykotsiuba.profitsoft_2.utils.EntitySource.prepareSearchRequest;
+import static com.ykotsiuba.profitsoft_2.utils.EntitySource.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.MOCK,
@@ -54,6 +56,8 @@ class ArticleControllerTest {
     private static final String ID_URL = API_URL + "/%s";
 
     private static final String SEARCH_URL = API_URL + "/_list";
+
+    private static final String REPORT_URL = API_URL + "/_report";
 
     static {
         ObjectMapper mapper = new ObjectMapper();
@@ -214,5 +218,19 @@ class ArticleControllerTest {
         String response = mvcResult.getResponse().getContentAsString();
         APIException responseDTO = DEFAULT_MAPPER.readValue(response, APIException.class);
         assertEquals(1, responseDTO.getErrors().size());
+    }
+
+    @Test
+    public void testGenerateReport() throws Exception {
+        ReportArticlesRequestDTO requestDTO = prepareReportRequest();
+        String body = DEFAULT_MAPPER.writeValueAsString(requestDTO);
+
+        mvc.perform(post(REPORT_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_OCTET_STREAM_VALUE))
+                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=articles.xlsx"));
     }
 }
