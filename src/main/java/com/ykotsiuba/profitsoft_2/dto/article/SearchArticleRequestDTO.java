@@ -1,4 +1,4 @@
-package com.ykotsiuba.profitsoft_2.dto;
+package com.ykotsiuba.profitsoft_2.dto.article;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

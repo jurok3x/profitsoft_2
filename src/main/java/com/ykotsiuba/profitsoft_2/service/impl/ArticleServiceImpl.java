@@ -1,6 +1,7 @@
 package com.ykotsiuba.profitsoft_2.service.impl;
 
-import com.ykotsiuba.profitsoft_2.dto.*;
+import com.ykotsiuba.profitsoft_2.dto.article.*;
+import com.ykotsiuba.profitsoft_2.dto.author.AuthorDTO;
 import com.ykotsiuba.profitsoft_2.entity.Article;
 import com.ykotsiuba.profitsoft_2.entity.Author;
 import com.ykotsiuba.profitsoft_2.entity.enums.Field;
@@ -9,15 +10,20 @@ import com.ykotsiuba.profitsoft_2.mapper.AuthorMapper;
 import com.ykotsiuba.profitsoft_2.repository.ArticleRepository;
 import com.ykotsiuba.profitsoft_2.service.ArticleService;
 import com.ykotsiuba.profitsoft_2.service.AuthorService;
+import com.ykotsiuba.profitsoft_2.service.ReportGenerationService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,6 +35,10 @@ import static com.ykotsiuba.profitsoft_2.entity.enums.ArticleMessages.ARTICLE_NO
 @RequiredArgsConstructor
 public class ArticleServiceImpl implements ArticleService {
 
+    private static final String FILENAME_HEADER = "attachment; filename=articles.xlsx";
+    @Value("${file.location:articles.xml}")
+    private String excelFileLocation;
+
     private final ArticleRepository articleRepository;
 
     private final AuthorService authorService;
@@ -36,6 +46,8 @@ public class ArticleServiceImpl implements ArticleService {
     private final ArticleMapper articleMapper;
 
     private final AuthorMapper authorMapper;
+
+    private final ReportGenerationService reportService;
 
     @Override
     public ArticleDTO save(SaveArticleRequestDTO requestDTO) {
@@ -104,8 +116,24 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public void generateReport(HttpServletResponse response) {
+    public void generateReport(ReportArticlesRequestDTO requestDTO, HttpServletResponse response) {
+        List<Article> articles = articleRepository.report(requestDTO);
+        List<ArticleResponseDTO> report = articles.stream()
+                .map(articleMapper::toResponseDTO)
+                .toList();
+        byte[] bytes = reportService.writeReport(report);
+        sendFileResponse(response, bytes);
+    }
 
+    private static void sendFileResponse(HttpServletResponse response, byte[] bytes) {
+        try {
+            response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+            response.setHeader(HttpHeaders.CONTENT_DISPOSITION, FILENAME_HEADER);
+            response.getOutputStream().write(bytes);
+            response.getOutputStream().flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

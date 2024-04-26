@@ -1,8 +1,8 @@
 package com.ykotsiuba.profitsoft_2.service;
 
-import com.ykotsiuba.profitsoft_2.dto.AuthorDTO;
-import com.ykotsiuba.profitsoft_2.dto.DeleteAuthorResponseDTO;
-import com.ykotsiuba.profitsoft_2.dto.SaveAuthorRequestDTO;
+import com.ykotsiuba.profitsoft_2.dto.author.AuthorDTO;
+import com.ykotsiuba.profitsoft_2.dto.author.DeleteAuthorResponseDTO;
+import com.ykotsiuba.profitsoft_2.dto.author.SaveAuthorRequestDTO;
 import com.ykotsiuba.profitsoft_2.entity.Author;
 
 import java.util.List;

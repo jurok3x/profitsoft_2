@@ -1,4 +1,4 @@
-package com.ykotsiuba.profitsoft_2.dto;
+package com.ykotsiuba.profitsoft_2.dto.article;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

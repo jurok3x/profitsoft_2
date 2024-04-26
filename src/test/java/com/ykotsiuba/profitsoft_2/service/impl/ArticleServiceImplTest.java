@@ -1,6 +1,6 @@
 package com.ykotsiuba.profitsoft_2.service.impl;
 
-import com.ykotsiuba.profitsoft_2.dto.*;
+import com.ykotsiuba.profitsoft_2.dto.article.*;
 import com.ykotsiuba.profitsoft_2.entity.Article;
 import com.ykotsiuba.profitsoft_2.entity.Author;
 import com.ykotsiuba.profitsoft_2.mapper.ArticleMapper;
@@ -10,6 +10,7 @@ import com.ykotsiuba.profitsoft_2.mapper.AuthorMapperImpl;
 import com.ykotsiuba.profitsoft_2.repository.ArticleRepository;
 import com.ykotsiuba.profitsoft_2.service.ArticleService;
 import com.ykotsiuba.profitsoft_2.service.AuthorService;
+import com.ykotsiuba.profitsoft_2.service.ReportGenerationService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +18,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockHttpServletResponse;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -39,13 +43,16 @@ class ArticleServiceImplTest {
 
     private ArticleMapper articleMapper;
 
+    private ReportGenerationService reportService;
+
     @BeforeEach
     void setUp() {
         articleRepository = mock(ArticleRepository.class);
+        reportService = mock(ReportGenerationService.class);
         authorService = mock(AuthorService.class);
         authorMapper = new AuthorMapperImpl();
         articleMapper = new ArticleMapperImpl();
-        articleService = new ArticleServiceImpl(articleRepository, authorService, articleMapper, authorMapper);
+        articleService = new ArticleServiceImpl(articleRepository, authorService, articleMapper, authorMapper, reportService);
     }
 
     @AfterEach
@@ -159,7 +166,18 @@ class ArticleServiceImplTest {
     }
 
     @Test
-    void generateReport() {
+    void whenGenerateReport_thenVerifyMethods() {
+        ReportArticlesRequestDTO requestDTO = prepareReportRequest();
+        List<Article> articles = Arrays.asList(prepareArticle());
+        byte[] bytes = {};
+        when(reportService.writeReport(any())).thenReturn(bytes);
+        when(articleRepository.report(any(ReportArticlesRequestDTO.class))).thenReturn(articles);
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        articleService.generateReport(requestDTO, response);
+
+        verify(articleRepository).report(any(ReportArticlesRequestDTO.class));
+        verify(reportService).writeReport(any());
     }
 
     @Test

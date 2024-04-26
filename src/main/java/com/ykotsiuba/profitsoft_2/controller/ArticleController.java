@@ -1,10 +1,12 @@
 package com.ykotsiuba.profitsoft_2.controller;
 
-import com.ykotsiuba.profitsoft_2.dto.*;
+import com.ykotsiuba.profitsoft_2.dto.article.*;
 import com.ykotsiuba.profitsoft_2.service.ArticleService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,5 +46,11 @@ public class ArticleController {
     public ResponseEntity<SearchArticlesResponseDTO> search(@RequestBody @Valid SearchArticleRequestDTO requestDTO) {
         SearchArticlesResponseDTO responseDTO = service.findBySearchParameters(requestDTO);
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/_report", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public void report(@RequestBody @Valid ReportArticlesRequestDTO requestDTO,
+                                       HttpServletResponse response) {
+        service.generateReport(requestDTO, response);
     }
 }

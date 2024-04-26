@@ -1,4 +1,4 @@
-package com.ykotsiuba.profitsoft_2.dto;
+package com.ykotsiuba.profitsoft_2.dto.author;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

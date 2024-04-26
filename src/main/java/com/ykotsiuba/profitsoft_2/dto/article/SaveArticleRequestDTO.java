@@ -1,4 +1,4 @@
-package com.ykotsiuba.profitsoft_2.dto;
+package com.ykotsiuba.profitsoft_2.dto.article;
 
 import com.ykotsiuba.profitsoft_2.entity.enums.Field;
 import com.ykotsiuba.profitsoft_2.validation.annotation.ValidEnum;
