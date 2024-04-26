@@ -1,8 +1,6 @@
 package com.ykotsiuba.profitsoft_2.service.impl;
 
 import com.ykotsiuba.profitsoft_2.dto.article.ArticleResponseDTO;
-import com.ykotsiuba.profitsoft_2.dto.article.ReportArticlesRequestDTO;
-import com.ykotsiuba.profitsoft_2.entity.Article;
 import com.ykotsiuba.profitsoft_2.service.ReportGenerationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,8 +8,9 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.ykotsiuba.profitsoft_2.utils.EntitySource.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static com.ykotsiuba.profitsoft_2.utils.EntitySource.prepareArticleResponse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class ExcelReportGenerationServiceTest {
 

@@ -12,7 +12,6 @@ import com.ykotsiuba.profitsoft_2.service.ArticleService;
 import com.ykotsiuba.profitsoft_2.service.AuthorService;
 import com.ykotsiuba.profitsoft_2.service.ReportGenerationService;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.servlet.http.HttpServletResponseWrapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,8 +20,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
