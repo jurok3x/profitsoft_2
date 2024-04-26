@@ -3,14 +3,12 @@ package com.ykotsiuba.profitsoft_2.service.impl;
 import com.ykotsiuba.profitsoft_2.dto.article.ArticleResponseDTO;
 import com.ykotsiuba.profitsoft_2.entity.enums.ExcelHeader;
 import com.ykotsiuba.profitsoft_2.service.ReportGenerationService;
-import jakarta.annotation.PostConstruct;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -18,9 +16,6 @@ import static com.ykotsiuba.profitsoft_2.entity.enums.ExcelColumnWidth.*;
 
 @Service
 public class ExcelReportGenerationService implements ReportGenerationService {
-
-    @Value("${file.location}")
-    private String excelFileLocation;
 
     private static final String HEADER_FONT_NAME = "Arial";
 
@@ -41,7 +36,7 @@ public class ExcelReportGenerationService implements ReportGenerationService {
     private CellStyle cellStyle;
 
     @Override
-    public void writeReport(List<ArticleResponseDTO> articles) {
+    public byte[] writeReport(List<ArticleResponseDTO> articles) {
         createHeader();
         for (int i=0; i< articles.size(); i++) {
             Row row = sheet.createRow(i + 1);
@@ -49,18 +44,17 @@ public class ExcelReportGenerationService implements ReportGenerationService {
             addArticle(row, articles.get(i));
         }
 
-        write();
+        return write();
     }
 
-    @PostConstruct
-    private void init() {
+    public ExcelReportGenerationService() {
         workbook = new XSSFWorkbook();
 
         sheet = workbook.createSheet(SHEET_NAME);
-        sheet.setColumnWidth(0, SMALL.getSize());
+        sheet.setColumnWidth(0, TINY.getSize());
         sheet.setColumnWidth(1, BIG.getSize());
         sheet.setColumnWidth(2, MEDIUM.getSize());
-        sheet.setColumnWidth(3, MEDIUM.getSize());
+        sheet.setColumnWidth(3, SMALL.getSize());
 
         initStyles();
     }
@@ -112,12 +106,15 @@ public class ExcelReportGenerationService implements ReportGenerationService {
     }
 
 
-    private void write() {
-        try(FileOutputStream outputStream = new FileOutputStream(excelFileLocation)) {
-            workbook.write(outputStream);
+    private byte[] write() {
+        try(ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+            workbook.write(bos);
             workbook.close();
+            return bos.toByteArray();
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+
         }
     }
 }

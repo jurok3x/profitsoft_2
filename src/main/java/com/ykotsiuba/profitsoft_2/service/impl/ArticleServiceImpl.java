@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
@@ -37,7 +38,8 @@ import static com.ykotsiuba.profitsoft_2.entity.enums.ArticleMessages.ARTICLE_NO
 @RequiredArgsConstructor
 public class ArticleServiceImpl implements ArticleService {
 
-    @Value("${file.location}")
+    private static final String FILENAME_HEADER = "attachment; filename=articles.xlsx";
+    @Value("${file.location:articles.xml}")
     private String excelFileLocation;
 
     private final ArticleRepository articleRepository;
@@ -122,12 +124,15 @@ public class ArticleServiceImpl implements ArticleService {
         List<ArticleResponseDTO> report = articles.stream()
                 .map(articleMapper::toResponseDTO)
                 .toList();
-        reportService.writeReport(report);
+        byte[] bytes = reportService.writeReport(report);
+        sendFileResponse(response, bytes);
+    }
 
-        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=articles.xlsx");
+    private static void sendFileResponse(HttpServletResponse response, byte[] bytes) {
         try {
-            response.getOutputStream().write(Files.readAllBytes(Paths.get(excelFileLocation)));
+            response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+            response.setHeader(HttpHeaders.CONTENT_DISPOSITION, FILENAME_HEADER);
+            response.getOutputStream().write(bytes);
             response.getOutputStream().flush();
         } catch (IOException e) {
             throw new RuntimeException(e);

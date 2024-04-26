@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface ReportGenerationService {
 
-    void writeReport(List<ArticleResponseDTO> articles);
+    byte[] writeReport(List<ArticleResponseDTO> articles);
 
 }
