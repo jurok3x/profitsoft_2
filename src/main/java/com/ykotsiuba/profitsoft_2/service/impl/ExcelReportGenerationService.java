@@ -27,9 +27,9 @@ public class ExcelReportGenerationService implements ReportGenerationService {
 
     private static final String SHEET_NAME = "Articles";
 
-    private Workbook workbook;
+    private final Workbook workbook;
 
-    private Sheet sheet;
+    private final Sheet sheet;
 
     private CellStyle headerStyle;
 
@@ -113,8 +113,6 @@ public class ExcelReportGenerationService implements ReportGenerationService {
             return bos.toByteArray();
         } catch (IOException e) {
             throw new RuntimeException(e);
-        } finally {
-
         }
     }
 }
