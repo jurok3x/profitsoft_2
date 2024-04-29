@@ -50,6 +50,11 @@ public interface ArticleService {
      */
     SearchArticlesResponseDTO findBySearchParameters(SearchArticleRequestDTO requestDTO);
 
+    /**
+     * Generates file report for articles based on search parameters. Report is sent to response output stream as array of bytes.
+     *
+     * @param requestDTO The request object containing search parameters.
+     */
     void generateReport(ReportArticlesRequestDTO requestDTO, HttpServletResponse response);
 
     UploadArticlesResponseDTO upload(MultipartFile file);
