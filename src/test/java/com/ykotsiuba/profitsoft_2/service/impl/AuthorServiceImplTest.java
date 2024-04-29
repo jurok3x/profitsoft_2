@@ -8,7 +8,6 @@ import com.ykotsiuba.profitsoft_2.mapper.AuthorMapper;
 import com.ykotsiuba.profitsoft_2.mapper.AuthorMapperImpl;
 import com.ykotsiuba.profitsoft_2.repository.AuthorRepository;
 import com.ykotsiuba.profitsoft_2.service.AuthorService;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
