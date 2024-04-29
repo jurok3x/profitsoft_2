@@ -5,6 +5,7 @@ import com.ykotsiuba.profitsoft_2.validation.annotation.ValidEnum;
 import com.ykotsiuba.profitsoft_2.validation.annotation.ValidYear;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,6 +24,7 @@ public class SaveArticleRequestDTO {
     private String field;
 
     @NotBlank(message = "author is required")
+    @Pattern(regexp = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", message = "invalid UUID format")
     private String authorId;
 
     @NotNull(message = "year is required")
