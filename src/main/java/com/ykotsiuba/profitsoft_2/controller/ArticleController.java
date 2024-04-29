@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -52,5 +53,11 @@ public class ArticleController {
     public void report(@RequestBody @Valid ReportArticlesRequestDTO requestDTO,
                                        HttpServletResponse response) {
         service.generateReport(requestDTO, response);
+    }
+
+    @PostMapping(value = "/upload")
+    public ResponseEntity<UploadArticlesResponseDTO> upload(@RequestParam("file") MultipartFile multipart) {
+        UploadArticlesResponseDTO responseDTO = service.upload(multipart);
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 }

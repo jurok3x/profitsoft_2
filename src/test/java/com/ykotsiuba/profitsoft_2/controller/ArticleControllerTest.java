@@ -19,10 +19,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.testcontainers.shaded.com.google.common.io.Files;
 
+import java.io.File;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -55,6 +59,8 @@ class ArticleControllerTest {
     private static final String SEARCH_URL = API_URL + "/_list";
 
     private static final String REPORT_URL = API_URL + "/_report";
+
+    private static final String UPLOAD_URL = API_URL + "/upload";
 
     static {
         ObjectMapper mapper = new ObjectMapper();
@@ -229,5 +235,36 @@ class ArticleControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_OCTET_STREAM_VALUE))
                 .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=articles.xlsx"));
+    }
+
+    @Test
+    public void testUpload() throws Exception {
+        final int initialCount = articleRepository.findAll().size();
+        final int expectedUploaded = 3;
+        final int expectedErrors = 7;
+        ReportArticlesRequestDTO requestDTO = prepareReportRequest();
+        File json = new File("src/test/resources/static/articles.json");
+        MockMultipartFile file
+                = new MockMultipartFile(
+                "file",
+                "hello.json",
+                "application/json",
+                Files.toByteArray(json)
+        );
+
+        MvcResult mvcResult = mvc.perform(multipart(UPLOAD_URL)
+                        .file(file)
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        String response = mvcResult.getResponse().getContentAsString();
+        UploadArticlesResponseDTO responseDTO = DEFAULT_MAPPER.readValue(response, UploadArticlesResponseDTO.class);
+        assertEquals(expectedErrors, responseDTO.getErrors());
+        assertEquals(expectedUploaded, responseDTO.getUploaded());
+
+        List<Article> articles = articleRepository.findAll();
+        assertEquals(initialCount + expectedUploaded, articles.size());
     }
 }
