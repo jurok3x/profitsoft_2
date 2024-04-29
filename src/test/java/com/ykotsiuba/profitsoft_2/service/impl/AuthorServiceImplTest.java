@@ -53,19 +53,10 @@ class AuthorServiceImplTest {
         Author author = prepareAuthor();
         when(authorRepository.findById(any(UUID.class))).thenReturn(Optional.of(author));
 
-        AuthorDTO responseDTO = authorService.findById(UUID.randomUUID().toString());
+        Optional<Author> response = authorService.findById(UUID.randomUUID().toString());
 
-        assertNotNull(responseDTO);
-        assertEquals(author.getFirstName(), responseDTO.getFirstName());
-        verify(authorRepository).findById(any(UUID.class));
-    }
-
-    @Test
-    void whenAuthorNotFound_thenThrowException() {
-        when(authorRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
-
-        assertThrows(EntityNotFoundException.class, () -> authorService.findById(UUID.randomUUID().toString()));
-
+        assertFalse(response.isEmpty());
+        assertEquals(author.getFirstName(), response.get().getFirstName());
         verify(authorRepository).findById(any(UUID.class));
     }
 

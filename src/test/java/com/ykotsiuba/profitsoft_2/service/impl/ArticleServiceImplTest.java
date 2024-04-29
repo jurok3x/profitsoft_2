@@ -8,6 +8,7 @@ import com.ykotsiuba.profitsoft_2.mapper.ArticleMapperImpl;
 import com.ykotsiuba.profitsoft_2.mapper.AuthorMapper;
 import com.ykotsiuba.profitsoft_2.mapper.AuthorMapperImpl;
 import com.ykotsiuba.profitsoft_2.repository.ArticleRepository;
+import com.ykotsiuba.profitsoft_2.repository.AuthorRepository;
 import com.ykotsiuba.profitsoft_2.service.ArticleService;
 import com.ykotsiuba.profitsoft_2.service.AuthorService;
 import com.ykotsiuba.profitsoft_2.service.ReportGenerationService;
@@ -37,9 +38,7 @@ class ArticleServiceImplTest {
 
     private ArticleRepository articleRepository;
 
-    private AuthorService authorService;
-
-    private AuthorMapper authorMapper;
+    private AuthorRepository authorRepository;
 
     private ArticleMapper articleMapper;
 
@@ -49,10 +48,9 @@ class ArticleServiceImplTest {
     void setUp() {
         articleRepository = mock(ArticleRepository.class);
         reportService = mock(ReportGenerationService.class);
-        authorService = mock(AuthorService.class);
-        authorMapper = new AuthorMapperImpl();
+        authorRepository = mock(AuthorRepository.class);
         articleMapper = new ArticleMapperImpl();
-        articleService = new ArticleServiceImpl(articleRepository, authorService, articleMapper, authorMapper, reportService);
+        articleService = new ArticleServiceImpl(articleRepository, authorRepository, articleMapper, reportService);
     }
 
     @AfterEach
@@ -66,25 +64,25 @@ class ArticleServiceImplTest {
         Author author = prepareAuthor();
         SaveArticleRequestDTO requestDTO = prepareSaveArticleRequest();
         when(articleRepository.save(any(Article.class))).thenReturn(article);
-        when(authorService.findById(any(String.class))).thenReturn(authorMapper.toDTO(author));
+        when(authorRepository.findById(any(UUID.class))).thenReturn(Optional.of(author));
 
         ArticleDTO responseDTO = articleService.save(requestDTO);
 
         assertNotNull(responseDTO);
         assertEquals(article.getField(), responseDTO.getField());
         verify(articleRepository).save(any(Article.class));
-        verify(authorService).findById(any(String.class));
+        verify(authorRepository).findById(any(UUID.class));
     }
 
     @Test
     void whenAuthorNotFound_thenThrowException() {
         SaveArticleRequestDTO requestDTO = prepareSaveArticleRequest();
-        when(authorService.findById(any(String.class))).thenThrow(EntityNotFoundException.class);
+        when(authorRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> articleService.save(requestDTO));
 
         verifyNoInteractions(articleRepository);
-        verify(authorService).findById(any(String.class));
+        verify(authorRepository).findById(any(UUID.class));
     }
 
     @Test
@@ -115,7 +113,7 @@ class ArticleServiceImplTest {
         SaveArticleRequestDTO requestDTO = prepareSaveArticleRequest();
         when(articleRepository.findById(any(UUID.class))).thenReturn(Optional.ofNullable(article));
         when(articleRepository.save(any(Article.class))).thenReturn(article);
-        when(authorService.findById(any(String.class))).thenReturn(authorMapper.toDTO(author));
+        when(authorRepository.findById(any(UUID.class))).thenReturn(Optional.of(author));
 
         ArticleDTO responseDTO = articleService.update(requestDTO, UUID.randomUUID().toString());
 
@@ -123,7 +121,7 @@ class ArticleServiceImplTest {
         assertEquals(article.getField(), responseDTO.getField());
         verify(articleRepository).save(any(Article.class));
         verify(articleRepository).findById(any(UUID.class));
-        verify(authorService).findById(any(String.class));
+        verify(authorRepository).findById(any(UUID.class));
     }
 
     @Test
@@ -134,7 +132,7 @@ class ArticleServiceImplTest {
         assertThrows(EntityNotFoundException.class, () -> articleService.update(requestDTO, UUID.randomUUID().toString()));
 
         verify(articleRepository).findById(any(UUID.class));
-        verifyNoInteractions(authorService);
+        verifyNoInteractions(authorRepository);
     }
 
     @Test

@@ -14,10 +14,9 @@ public interface AuthorService {
      * Finds an author by ID.
      *
      * @param id The ID of the author to find.
-     * @return The author DTO if found.
-     * @throws jakarta.persistence.EntityNotFoundException if author not found.
+     * @return An optional containing the author if found, otherwise empty.
      */
-    AuthorDTO findById(String id);
+    Optional<Author> findById(String id);
 
     /**
      * Finds an author by email.
