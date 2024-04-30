@@ -1,6 +1,7 @@
 package com.ykotsiuba.profitsoft_2.controller;
 
 import com.ykotsiuba.profitsoft_2.dto.APIException;
+import com.ykotsiuba.profitsoft_2.exception.FileParsingException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -36,6 +37,16 @@ public class RESTExceptionHandler  extends ResponseEntityExceptionHandler {
         details.add(ex.getMessage());
 
         APIException apiException = new APIException("Invalid argument", HttpStatus.BAD_REQUEST,
+                LocalDateTime.now(), details);
+        return new ResponseEntity<>(apiException, apiException.getHttpStatus());
+    }
+
+    @ExceptionHandler({ FileParsingException.class })
+    protected ResponseEntity<Object> handleFileParsingException(FileParsingException ex, WebRequest request) {
+        List<String> details = new ArrayList<>();
+        details.add(ex.getMessage());
+
+        APIException apiException = new APIException("Error parsing file", HttpStatus.BAD_REQUEST,
                 LocalDateTime.now(), details);
         return new ResponseEntity<>(apiException, apiException.getHttpStatus());
     }
