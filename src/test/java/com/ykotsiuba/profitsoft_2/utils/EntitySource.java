@@ -11,12 +11,21 @@ import com.ykotsiuba.profitsoft_2.entity.enums.Field;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
+import org.testcontainers.shaded.com.google.common.io.Files;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 public class EntitySource {
+
+    private EntitySource() {}
+
     public static SaveAuthorRequestDTO prepareSaveAuthorRequest() {
         return SaveAuthorRequestDTO.builder()
                 .firstName("Keanu")
@@ -88,5 +97,17 @@ public class EntitySource {
     public static  Page<Article> prepareTestPage(Pageable pageRequest) {
         List<Article> articles = Arrays.asList(prepareArticle());
         return new PageImpl<>(articles, pageRequest, articles.size());
+    }
+
+    public static MockMultipartFile prepareJsonFile() throws IOException {
+        File json = new File("src/test/resources/static/articles.json");
+        MockMultipartFile file
+                = new MockMultipartFile(
+                "file",
+                "hello.json",
+                MediaType.APPLICATION_JSON_VALUE,
+                Files.toByteArray(json)
+        );
+        return file;
     }
 }
