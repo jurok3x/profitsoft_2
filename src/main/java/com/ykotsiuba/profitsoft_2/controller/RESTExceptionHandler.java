@@ -1,4 +1,4 @@
-package com.ykotsiuba.profitsoft_2.configuration;
+package com.ykotsiuba.profitsoft_2.controller;
 
 import com.ykotsiuba.profitsoft_2.dto.APIException;
 import jakarta.persistence.EntityNotFoundException;
