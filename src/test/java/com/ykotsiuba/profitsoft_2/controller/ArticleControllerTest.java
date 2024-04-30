@@ -1,10 +1,6 @@
 package com.ykotsiuba.profitsoft_2.controller;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ykotsiuba.profitsoft_2.Profitsoft2Application;
 import com.ykotsiuba.profitsoft_2.TestProfitsoft2Application;
 import com.ykotsiuba.profitsoft_2.dto.APIException;
@@ -23,15 +19,12 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.testcontainers.shaded.com.google.common.io.Files;
 
-import java.io.File;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.ykotsiuba.profitsoft_2.entity.enums.ArticleMessages.ARTICLE_DELETED;
-import static com.ykotsiuba.profitsoft_2.entity.enums.ArticleMessages.ARTICLE_NOT_FOUND;
+import static com.ykotsiuba.profitsoft_2.entity.enums.ArticleMessages.*;
 import static com.ykotsiuba.profitsoft_2.utils.EntitySource.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -48,7 +41,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class ArticleControllerTest {
 
-    private static final ObjectMapper DEFAULT_MAPPER;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private static final String API_URL = "/articles";
 
@@ -61,15 +55,6 @@ class ArticleControllerTest {
     private static final String REPORT_URL = API_URL + "/_report";
 
     private static final String UPLOAD_URL = API_URL + "/upload";
-
-    static {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        mapper.registerModule(new JavaTimeModule());
-        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        DEFAULT_MAPPER = mapper;
-    }
 
     @Autowired
     private MockMvc mvc;
@@ -85,7 +70,7 @@ class ArticleControllerTest {
                 .andReturn();
 
         String response = mvcResult.getResponse().getContentAsString();
-        ArticleDTO responseDTO = DEFAULT_MAPPER.readValue(response, ArticleDTO.class);
+        ArticleDTO responseDTO = objectMapper.readValue(response, ArticleDTO.class);
         assertEquals("Physics Today", responseDTO.getJournal());
     }
 
@@ -98,7 +83,7 @@ class ArticleControllerTest {
                 .andReturn();
 
         String response = mvcResult.getResponse().getContentAsString();
-        APIException responseDTO = DEFAULT_MAPPER.readValue(response, APIException.class);
+        APIException responseDTO = objectMapper.readValue(response, APIException.class);
         assertEquals(String.format(ARTICLE_NOT_FOUND.getMessage(), invalidId), responseDTO.getErrors().get(0));
     }
 
@@ -106,7 +91,7 @@ class ArticleControllerTest {
     @Transactional
     public void testSaveArticle() throws Exception {
         SaveArticleRequestDTO saveArticleRequestDTO = prepareSaveArticleRequest();
-        String body = DEFAULT_MAPPER.writeValueAsString(saveArticleRequestDTO);
+        String body = objectMapper.writeValueAsString(saveArticleRequestDTO);
 
         MvcResult mvcResult = mvc.perform(post(API_URL)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -117,7 +102,7 @@ class ArticleControllerTest {
                 .andReturn();
 
         String response = mvcResult.getResponse().getContentAsString();
-        ArticleDTO responseDTO = DEFAULT_MAPPER.readValue(response, ArticleDTO.class);
+        ArticleDTO responseDTO = objectMapper.readValue(response, ArticleDTO.class);
         UUID id = responseDTO.getId();
         assertNotNull(id);
 
@@ -131,7 +116,7 @@ class ArticleControllerTest {
         SaveArticleRequestDTO saveArticleRequestDTO = prepareSaveArticleRequest();
         saveArticleRequestDTO.setTitle(null);
         saveArticleRequestDTO.setJournal(null);
-        String body = DEFAULT_MAPPER.writeValueAsString(saveArticleRequestDTO);
+        String body = objectMapper.writeValueAsString(saveArticleRequestDTO);
 
         MvcResult mvcResult = mvc.perform(post(API_URL)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -142,7 +127,7 @@ class ArticleControllerTest {
                 .andReturn();
 
           String response = mvcResult.getResponse().getContentAsString();
-          APIException responseDTO = DEFAULT_MAPPER.readValue(response, APIException.class);
+          APIException responseDTO = objectMapper.readValue(response, APIException.class);
           assertEquals(2, responseDTO.getErrors().size());
     }
 
@@ -150,7 +135,7 @@ class ArticleControllerTest {
     @Transactional
     public void testUpdateArticle() throws Exception {
         SaveArticleRequestDTO updateArticleRequestDTO = prepareSaveArticleRequest();
-        String body = DEFAULT_MAPPER.writeValueAsString(updateArticleRequestDTO);
+        String body = objectMapper.writeValueAsString(updateArticleRequestDTO);
 
         MvcResult mvcResult = mvc.perform(put(String.format(ID_URL, ID))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -161,7 +146,7 @@ class ArticleControllerTest {
                 .andReturn();
 
         String response = mvcResult.getResponse().getContentAsString();
-        ArticleDTO responseDTO = DEFAULT_MAPPER.readValue(response, ArticleDTO.class);
+        ArticleDTO responseDTO = objectMapper.readValue(response, ArticleDTO.class);
         assertEquals(updateArticleRequestDTO.getTitle(), responseDTO.getTitle());
 
         Optional<Article> byId = articleRepository.findById(UUID.fromString(ID));
@@ -179,7 +164,7 @@ class ArticleControllerTest {
                 .andReturn();
 
         String response = mvcResult.getResponse().getContentAsString();
-        DeleteArticleResponseDTO responseDTO = DEFAULT_MAPPER.readValue(response, DeleteArticleResponseDTO.class);
+        DeleteArticleResponseDTO responseDTO = objectMapper.readValue(response, DeleteArticleResponseDTO.class);
         assertEquals(ARTICLE_DELETED.getMessage(), responseDTO.getMessage());
 
         Optional<Article> byId = articleRepository.findById(UUID.fromString(ID));
@@ -189,7 +174,7 @@ class ArticleControllerTest {
     @Test
     public void testSearchArticles() throws Exception {
         SearchArticleRequestDTO requestDTO = prepareSearchRequest();
-        String body = DEFAULT_MAPPER.writeValueAsString(requestDTO);
+        String body = objectMapper.writeValueAsString(requestDTO);
 
         MvcResult mvcResult = mvc.perform(post(SEARCH_URL)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -200,7 +185,7 @@ class ArticleControllerTest {
                 .andReturn();
 
         String response = mvcResult.getResponse().getContentAsString();
-        SearchArticlesResponseDTO responseDTO = DEFAULT_MAPPER.readValue(response, SearchArticlesResponseDTO.class);
+        SearchArticlesResponseDTO responseDTO = objectMapper.readValue(response, SearchArticlesResponseDTO.class);
         assertFalse(responseDTO.getList().isEmpty());
     }
 
@@ -208,7 +193,7 @@ class ArticleControllerTest {
     public void testSearchArticles_invalidPaging() throws Exception {
         SearchArticleRequestDTO requestDTO = prepareSearchRequest();
         requestDTO.setPage(null);
-        String body = DEFAULT_MAPPER.writeValueAsString(requestDTO);
+        String body = objectMapper.writeValueAsString(requestDTO);
 
         MvcResult mvcResult = mvc.perform(post(SEARCH_URL)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -219,14 +204,14 @@ class ArticleControllerTest {
                 .andReturn();
 
         String response = mvcResult.getResponse().getContentAsString();
-        APIException responseDTO = DEFAULT_MAPPER.readValue(response, APIException.class);
+        APIException responseDTO = objectMapper.readValue(response, APIException.class);
         assertEquals(1, responseDTO.getErrors().size());
     }
 
     @Test
     public void testGenerateReport() throws Exception {
         ReportArticlesRequestDTO requestDTO = prepareReportRequest();
-        String body = DEFAULT_MAPPER.writeValueAsString(requestDTO);
+        String body = objectMapper.writeValueAsString(requestDTO);
 
         mvc.perform(post(REPORT_URL)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -238,19 +223,12 @@ class ArticleControllerTest {
     }
 
     @Test
+    @Transactional
     public void testUpload() throws Exception {
         final int initialCount = articleRepository.findAll().size();
         final int expectedUploaded = 3;
         final int expectedErrors = 7;
-        ReportArticlesRequestDTO requestDTO = prepareReportRequest();
-        File json = new File("src/test/resources/static/articles.json");
-        MockMultipartFile file
-                = new MockMultipartFile(
-                "file",
-                "hello.json",
-                "application/json",
-                Files.toByteArray(json)
-        );
+        MockMultipartFile file = prepareJsonFile();
 
         MvcResult mvcResult = mvc.perform(multipart(UPLOAD_URL)
                         .file(file)
@@ -260,11 +238,33 @@ class ArticleControllerTest {
                 .andReturn();
 
         String response = mvcResult.getResponse().getContentAsString();
-        UploadArticlesResponseDTO responseDTO = DEFAULT_MAPPER.readValue(response, UploadArticlesResponseDTO.class);
+        UploadArticlesResponseDTO responseDTO = objectMapper.readValue(response, UploadArticlesResponseDTO.class);
         assertEquals(expectedErrors, responseDTO.getErrors());
         assertEquals(expectedUploaded, responseDTO.getUploaded());
 
         List<Article> articles = articleRepository.findAll();
         assertEquals(initialCount + expectedUploaded, articles.size());
+    }
+
+    @Test
+    public void testUpload_invalidFile() throws Exception {
+        MockMultipartFile plainTextFile
+                = new MockMultipartFile(
+                "file",
+                "file.txt",
+                MediaType.TEXT_PLAIN_VALUE,
+                "Hello world".getBytes()
+        );
+
+        MvcResult mvcResult = mvc.perform(multipart(UPLOAD_URL)
+                        .file(plainTextFile)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        String response = mvcResult.getResponse().getContentAsString();
+        APIException responseDTO = objectMapper.readValue(response, APIException.class);
+        assertEquals(FILE_NOT_VALID.getMessage(), responseDTO.getErrors().get(0));
     }
 }

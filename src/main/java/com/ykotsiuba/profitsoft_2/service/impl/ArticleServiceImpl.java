@@ -32,8 +32,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.ykotsiuba.profitsoft_2.entity.enums.ArticleMessages.ARTICLE_DELETED;
-import static com.ykotsiuba.profitsoft_2.entity.enums.ArticleMessages.ARTICLE_NOT_FOUND;
+import static com.ykotsiuba.profitsoft_2.entity.enums.ArticleMessages.*;
 import static com.ykotsiuba.profitsoft_2.entity.enums.AuthorMessages.AUTHOR_NOT_FOUND;
 
 @Service
@@ -142,6 +141,10 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public UploadArticlesResponseDTO upload(MultipartFile file) {
+        if(file.isEmpty() || file.getContentType() != MediaType.APPLICATION_JSON_VALUE) {
+            throw new IllegalArgumentException(FILE_NOT_VALID.getMessage());
+        }
+
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -149,7 +152,6 @@ public class ArticleServiceImpl implements ArticleService {
             byte[] fileBytes = file.getBytes();
 
             List<UploadArticleRequestDTO> requestDTO = objectMapper.readValue(fileBytes, new TypeReference<List<UploadArticleRequestDTO>>() {});
-            Set<ConstraintViolation<UploadArticleRequestDTO>> validate = validator.validate(requestDTO.get(0));
 
             List<Article> articles = requestDTO
                     .stream()
