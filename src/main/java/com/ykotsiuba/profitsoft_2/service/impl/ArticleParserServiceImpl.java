@@ -10,6 +10,7 @@ import com.ykotsiuba.profitsoft_2.service.ArticleParserService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,10 +18,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ArticleParserServiceImpl implements ArticleParserService {
 
     private final Validator validator;
@@ -28,10 +31,12 @@ public class ArticleParserServiceImpl implements ArticleParserService {
     @Override
     public ParsingResultDTO parse(MultipartFile file) {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+            log.info("Parsing file with name: {}", file.getName());
             JsonFactory jFactory = new JsonFactory();
             JsonParser jParser = jFactory.createParser(reader);
             return readJsonList(jParser);
         } catch (IOException e) {
+            log.error("Error parsing file");
             throw new FileParsingException(e.getMessage(), e);
         }
     }
@@ -44,6 +49,7 @@ public class ArticleParserServiceImpl implements ArticleParserService {
             if (violations.isEmpty()) {
                 resultDTO.addValidRequest(requestDTO);
             } else {
+                log.error("Invalid upload dto: {}", requestDTO);
                 resultDTO.addInvalidRequest(requestDTO);
             }
         }
@@ -65,16 +71,12 @@ public class ArticleParserServiceImpl implements ArticleParserService {
     }
 
     private boolean validParameter(String fieldName) {
-        if(fieldName == null) {
+        if (fieldName == null) {
             return false;
         }
-        Field[] fields = UploadArticleRequestDTO.class.getDeclaredFields();
-        for (Field field : fields) {
-            if(fieldName.equals(field.getName())){
-                return true;
-            }
-        }
-        return false;
+        return Arrays.stream(UploadArticleRequestDTO.class.getDeclaredFields())
+                .map(Field::getName)
+                .anyMatch(fieldName::equals);
     }
 
     private void setField(UploadArticleRequestDTO requestDTO, String parameterName, String parsedValue) {

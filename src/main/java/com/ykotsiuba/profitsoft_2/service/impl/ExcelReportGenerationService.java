@@ -3,6 +3,7 @@ package com.ykotsiuba.profitsoft_2.service.impl;
 import com.ykotsiuba.profitsoft_2.dto.article.ArticleResponseDTO;
 import com.ykotsiuba.profitsoft_2.entity.enums.ExcelHeader;
 import com.ykotsiuba.profitsoft_2.service.ReportGenerationService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -15,6 +16,7 @@ import java.util.List;
 import static com.ykotsiuba.profitsoft_2.entity.enums.ExcelColumnWidth.*;
 
 @Service
+@Slf4j
 public class ExcelReportGenerationService implements ReportGenerationService {
 
     private static final String HEADER_FONT_NAME = "Arial";
@@ -108,10 +110,12 @@ public class ExcelReportGenerationService implements ReportGenerationService {
 
     private byte[] write() {
         try(ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+            log.info("Writing excel file...");
             workbook.write(bos);
             workbook.close();
             return bos.toByteArray();
         } catch (IOException e) {
+            log.info("Error writing excel file...");
             throw new RuntimeException(e);
         }
     }
