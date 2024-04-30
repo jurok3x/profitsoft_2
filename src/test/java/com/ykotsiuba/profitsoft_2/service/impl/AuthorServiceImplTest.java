@@ -8,7 +8,6 @@ import com.ykotsiuba.profitsoft_2.mapper.AuthorMapper;
 import com.ykotsiuba.profitsoft_2.mapper.AuthorMapperImpl;
 import com.ykotsiuba.profitsoft_2.repository.AuthorRepository;
 import com.ykotsiuba.profitsoft_2.service.AuthorService;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,19 +52,10 @@ class AuthorServiceImplTest {
         Author author = prepareAuthor();
         when(authorRepository.findById(any(UUID.class))).thenReturn(Optional.of(author));
 
-        AuthorDTO responseDTO = authorService.findById(UUID.randomUUID().toString());
+        Optional<Author> response = authorService.findById(UUID.randomUUID().toString());
 
-        assertNotNull(responseDTO);
-        assertEquals(author.getFirstName(), responseDTO.getFirstName());
-        verify(authorRepository).findById(any(UUID.class));
-    }
-
-    @Test
-    void whenAuthorNotFound_thenThrowException() {
-        when(authorRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
-
-        assertThrows(EntityNotFoundException.class, () -> authorService.findById(UUID.randomUUID().toString()));
-
+        assertFalse(response.isEmpty());
+        assertEquals(author.getFirstName(), response.get().getFirstName());
         verify(authorRepository).findById(any(UUID.class));
     }
 

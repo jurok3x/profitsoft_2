@@ -15,7 +15,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SaveArticleRequestDTO {
+public class UploadArticleRequestDTO {
+
     @NotBlank(message = "title is required")
     private String title;
 
@@ -24,7 +25,7 @@ public class SaveArticleRequestDTO {
     private String field;
 
     @NotBlank(message = "author is required")
-    @Pattern(regexp = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", message = "invalid UUID format")
+    @Pattern(regexp = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", message = "Invalid UUID format")
     private String authorId;
 
     @NotNull(message = "year is required")

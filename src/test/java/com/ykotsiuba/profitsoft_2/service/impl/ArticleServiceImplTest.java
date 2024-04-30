@@ -5,11 +5,10 @@ import com.ykotsiuba.profitsoft_2.entity.Article;
 import com.ykotsiuba.profitsoft_2.entity.Author;
 import com.ykotsiuba.profitsoft_2.mapper.ArticleMapper;
 import com.ykotsiuba.profitsoft_2.mapper.ArticleMapperImpl;
-import com.ykotsiuba.profitsoft_2.mapper.AuthorMapper;
-import com.ykotsiuba.profitsoft_2.mapper.AuthorMapperImpl;
 import com.ykotsiuba.profitsoft_2.repository.ArticleRepository;
+import com.ykotsiuba.profitsoft_2.repository.AuthorRepository;
+import com.ykotsiuba.profitsoft_2.service.ArticleParserService;
 import com.ykotsiuba.profitsoft_2.service.ArticleService;
-import com.ykotsiuba.profitsoft_2.service.AuthorService;
 import com.ykotsiuba.profitsoft_2.service.ReportGenerationService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.AfterEach;
@@ -19,7 +18,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockMultipartFile;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +31,7 @@ import static com.ykotsiuba.profitsoft_2.utils.EntitySource.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 class ArticleServiceImplTest {
 
@@ -37,22 +39,22 @@ class ArticleServiceImplTest {
 
     private ArticleRepository articleRepository;
 
-    private AuthorService authorService;
-
-    private AuthorMapper authorMapper;
+    private AuthorRepository authorRepository;
 
     private ArticleMapper articleMapper;
 
     private ReportGenerationService reportService;
 
+    private ArticleParserService parserService;
+
     @BeforeEach
     void setUp() {
         articleRepository = mock(ArticleRepository.class);
         reportService = mock(ReportGenerationService.class);
-        authorService = mock(AuthorService.class);
-        authorMapper = new AuthorMapperImpl();
+        authorRepository = mock(AuthorRepository.class);
         articleMapper = new ArticleMapperImpl();
-        articleService = new ArticleServiceImpl(articleRepository, authorService, articleMapper, authorMapper, reportService);
+        parserService = mock(ArticleParserServiceImpl.class);
+        articleService = new ArticleServiceImpl(articleRepository, authorRepository, articleMapper, reportService, parserService);
     }
 
     @AfterEach
@@ -66,25 +68,25 @@ class ArticleServiceImplTest {
         Author author = prepareAuthor();
         SaveArticleRequestDTO requestDTO = prepareSaveArticleRequest();
         when(articleRepository.save(any(Article.class))).thenReturn(article);
-        when(authorService.findById(any(String.class))).thenReturn(authorMapper.toDTO(author));
+        when(authorRepository.findById(any(UUID.class))).thenReturn(Optional.of(author));
 
         ArticleDTO responseDTO = articleService.save(requestDTO);
 
         assertNotNull(responseDTO);
         assertEquals(article.getField(), responseDTO.getField());
         verify(articleRepository).save(any(Article.class));
-        verify(authorService).findById(any(String.class));
+        verify(authorRepository).findById(any(UUID.class));
     }
 
     @Test
     void whenAuthorNotFound_thenThrowException() {
         SaveArticleRequestDTO requestDTO = prepareSaveArticleRequest();
-        when(authorService.findById(any(String.class))).thenThrow(EntityNotFoundException.class);
+        when(authorRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> articleService.save(requestDTO));
 
         verifyNoInteractions(articleRepository);
-        verify(authorService).findById(any(String.class));
+        verify(authorRepository).findById(any(UUID.class));
     }
 
     @Test
@@ -115,7 +117,7 @@ class ArticleServiceImplTest {
         SaveArticleRequestDTO requestDTO = prepareSaveArticleRequest();
         when(articleRepository.findById(any(UUID.class))).thenReturn(Optional.ofNullable(article));
         when(articleRepository.save(any(Article.class))).thenReturn(article);
-        when(authorService.findById(any(String.class))).thenReturn(authorMapper.toDTO(author));
+        when(authorRepository.findById(any(UUID.class))).thenReturn(Optional.of(author));
 
         ArticleDTO responseDTO = articleService.update(requestDTO, UUID.randomUUID().toString());
 
@@ -123,7 +125,7 @@ class ArticleServiceImplTest {
         assertEquals(article.getField(), responseDTO.getField());
         verify(articleRepository).save(any(Article.class));
         verify(articleRepository).findById(any(UUID.class));
-        verify(authorService).findById(any(String.class));
+        verify(authorRepository).findById(any(UUID.class));
     }
 
     @Test
@@ -134,7 +136,7 @@ class ArticleServiceImplTest {
         assertThrows(EntityNotFoundException.class, () -> articleService.update(requestDTO, UUID.randomUUID().toString()));
 
         verify(articleRepository).findById(any(UUID.class));
-        verifyNoInteractions(authorService);
+        verifyNoInteractions(authorRepository);
     }
 
     @Test
@@ -181,6 +183,18 @@ class ArticleServiceImplTest {
     }
 
     @Test
-    void upload() {
+    void whenUpload_thenReturnCorrectResponse() throws IOException {
+        MockMultipartFile file = prepareJsonFile();
+        ParsingResultDTO resultDTO = prepareParsingResult();
+        List<Article> articles = Arrays.asList(prepareArticle());
+        when(parserService.parse(any(MockMultipartFile.class))).thenReturn(resultDTO);
+        when(articleRepository.saveAll(any())).thenReturn(articles);
+
+        UploadArticlesResponseDTO responseDTO = articleService.upload(file);
+
+        assertEquals(1, responseDTO.getUploaded());
+        assertEquals(1, responseDTO.getErrors());
+        verify(articleRepository).saveAll(any());
+        verify(parserService).parse(any(MockMultipartFile.class));
     }
 }

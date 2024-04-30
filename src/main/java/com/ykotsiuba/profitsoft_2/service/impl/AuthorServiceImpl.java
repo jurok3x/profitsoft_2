@@ -26,9 +26,8 @@ public class AuthorServiceImpl implements AuthorService {
     private  final AuthorMapper authorMapper;
 
     @Override
-    public AuthorDTO findById(String id) {
-        Author author = findOrThrow(id);
-        return authorMapper.toDTO(author);
+    public Optional<Author> findById(String id) {
+        return authorRepository.findById(UUID.fromString(id));
     }
 
     @Override
