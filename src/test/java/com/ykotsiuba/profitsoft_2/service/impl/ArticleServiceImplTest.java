@@ -7,6 +7,7 @@ import com.ykotsiuba.profitsoft_2.mapper.ArticleMapper;
 import com.ykotsiuba.profitsoft_2.mapper.ArticleMapperImpl;
 import com.ykotsiuba.profitsoft_2.repository.ArticleRepository;
 import com.ykotsiuba.profitsoft_2.repository.AuthorRepository;
+import com.ykotsiuba.profitsoft_2.service.ArticleParserService;
 import com.ykotsiuba.profitsoft_2.service.ArticleService;
 import com.ykotsiuba.profitsoft_2.service.ReportGenerationService;
 import jakarta.persistence.EntityNotFoundException;
@@ -17,7 +18,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockMultipartFile;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +31,7 @@ import static com.ykotsiuba.profitsoft_2.utils.EntitySource.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 class ArticleServiceImplTest {
 
@@ -41,13 +45,16 @@ class ArticleServiceImplTest {
 
     private ReportGenerationService reportService;
 
+    private ArticleParserService parserService;
+
     @BeforeEach
     void setUp() {
         articleRepository = mock(ArticleRepository.class);
         reportService = mock(ReportGenerationService.class);
         authorRepository = mock(AuthorRepository.class);
         articleMapper = new ArticleMapperImpl();
-        articleService = new ArticleServiceImpl(articleRepository, authorRepository, articleMapper, reportService);
+        parserService = mock(ArticleParserServiceImpl.class);
+        articleService = new ArticleServiceImpl(articleRepository, authorRepository, articleMapper, reportService, parserService);
     }
 
     @AfterEach
@@ -176,6 +183,18 @@ class ArticleServiceImplTest {
     }
 
     @Test
-    void upload() {
+    void whenUpload_thenReturnCorrectResponse() throws IOException {
+        MockMultipartFile file = prepareJsonFile();
+        ParsingResultDTO resultDTO = prepareParsingResult();
+        List<Article> articles = Arrays.asList(prepareArticle());
+        when(parserService.parse(any(MockMultipartFile.class))).thenReturn(resultDTO);
+        when(articleRepository.saveAll(any())).thenReturn(articles);
+
+        UploadArticlesResponseDTO responseDTO = articleService.upload(file);
+
+        assertEquals(1, responseDTO.getUploaded());
+        assertEquals(1, responseDTO.getErrors());
+        verify(articleRepository).saveAll(any());
+        verify(parserService).parse(any(MockMultipartFile.class));
     }
 }

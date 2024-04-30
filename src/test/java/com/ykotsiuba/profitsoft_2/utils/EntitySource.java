@@ -1,9 +1,6 @@
 package com.ykotsiuba.profitsoft_2.utils;
 
-import com.ykotsiuba.profitsoft_2.dto.article.ArticleResponseDTO;
-import com.ykotsiuba.profitsoft_2.dto.article.ReportArticlesRequestDTO;
-import com.ykotsiuba.profitsoft_2.dto.article.SaveArticleRequestDTO;
-import com.ykotsiuba.profitsoft_2.dto.article.SearchArticleRequestDTO;
+import com.ykotsiuba.profitsoft_2.dto.article.*;
 import com.ykotsiuba.profitsoft_2.dto.author.SaveAuthorRequestDTO;
 import com.ykotsiuba.profitsoft_2.entity.Article;
 import com.ykotsiuba.profitsoft_2.entity.Author;
@@ -108,5 +105,22 @@ public class EntitySource {
                 Files.toByteArray(json)
         );
         return file;
+    }
+
+    public static ParsingResultDTO prepareParsingResult() {
+        ParsingResultDTO resultDTO = new ParsingResultDTO();
+        resultDTO.addValidRequest(prepareUploadArticleRequest());
+        resultDTO.addInvalidRequest(new UploadArticleRequestDTO());
+        return resultDTO;
+    }
+
+    public static UploadArticleRequestDTO prepareUploadArticleRequest() {
+        return UploadArticleRequestDTO.builder()
+                .title("Quantum")
+                .authorId("00000000-0000-0000-0000-000000000001")
+                .field("PHYSICS")
+                .journal("Physics Today")
+                .year(2020)
+                .build();
     }
 }
