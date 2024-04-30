@@ -1,8 +1,5 @@
 package com.ykotsiuba.profitsoft_2.service.impl;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ykotsiuba.profitsoft_2.dto.article.*;
 import com.ykotsiuba.profitsoft_2.entity.Article;
 import com.ykotsiuba.profitsoft_2.entity.Author;
@@ -10,14 +7,12 @@ import com.ykotsiuba.profitsoft_2.entity.enums.Field;
 import com.ykotsiuba.profitsoft_2.mapper.ArticleMapper;
 import com.ykotsiuba.profitsoft_2.repository.ArticleRepository;
 import com.ykotsiuba.profitsoft_2.repository.AuthorRepository;
+import com.ykotsiuba.profitsoft_2.service.ArticleParserService;
 import com.ykotsiuba.profitsoft_2.service.ArticleService;
 import com.ykotsiuba.profitsoft_2.service.ReportGenerationService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import static com.ykotsiuba.profitsoft_2.entity.enums.ArticleMessages.*;
@@ -38,9 +32,6 @@ import static com.ykotsiuba.profitsoft_2.entity.enums.AuthorMessages.AUTHOR_NOT_
 @Service
 @RequiredArgsConstructor
 public class ArticleServiceImpl implements ArticleService {
-
-    @Autowired
-    private Validator validator;
 
     private static final String FILENAME_HEADER = "attachment; filename=articles.xlsx";
 
@@ -51,6 +42,8 @@ public class ArticleServiceImpl implements ArticleService {
     private final ArticleMapper articleMapper;
 
     private final ReportGenerationService reportService;
+
+    private final ArticleParserService parserService;
 
     @Override
     public ArticleDTO save(SaveArticleRequestDTO requestDTO) {
@@ -145,28 +138,21 @@ public class ArticleServiceImpl implements ArticleService {
             throw new IllegalArgumentException(FILE_NOT_VALID.getMessage());
         }
 
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        ParsingResultDTO resultDTO = parserService.parse(file);
+        List<Article> articles = resultDTO.getValidRequests().stream()
+                .filter(this::validateArticleRequest)
+                .map(this::convertFromUploadDTO)
+                .toList();
+        List<Article> saved = articleRepository.saveAll(articles);
+        return UploadArticlesResponseDTO.builder()
+                .uploaded(saved.size())
+                .errors(resultDTO.getTotalCount() - saved.size())
+                .build();
+    }
 
-            byte[] fileBytes = file.getBytes();
-
-            List<UploadArticleRequestDTO> requestDTO = objectMapper.readValue(fileBytes, new TypeReference<List<UploadArticleRequestDTO>>() {});
-
-            List<Article> articles = requestDTO
-                    .stream()
-                    .filter(article -> validator.validate(article).isEmpty())
-                    .filter(article -> authorRepository.findById(UUID.fromString(article.getAuthorId())).isPresent())
-                    .map(this::convertFromUploadDTO)
-                    .toList();
-            articleRepository.saveAll(articles);
-            return UploadArticlesResponseDTO.builder()
-                    .uploaded(articles.size())
-                    .errors(requestDTO.size() - articles.size())
-                    .build();
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
-        }
+    private boolean validateArticleRequest(UploadArticleRequestDTO requestDTO) {
+        Optional<Author> optionalAuthor = authorRepository.findById(UUID.fromString(requestDTO.getAuthorId()));
+        return optionalAuthor.isPresent();
     }
 
     private Article convertFromUploadDTO(UploadArticleRequestDTO requestDTO) {
