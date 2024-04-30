@@ -11,22 +11,6 @@ import java.util.Optional;
 public interface AuthorService {
 
     /**
-     * Finds an author by ID.
-     *
-     * @param id The ID of the author to find.
-     * @return An optional containing the author if found, otherwise empty.
-     */
-    Optional<Author> findById(String id);
-
-    /**
-     * Finds an author by email.
-     *
-     * @param email The email of the author to find.
-     * @return An optional containing the author if found, otherwise empty.
-     */
-    Optional<Author> findByEmail(String email);
-
-    /**
      * Retrieves all authors.
      *
      * @return A list of authors.

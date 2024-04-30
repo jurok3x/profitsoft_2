@@ -11,7 +11,6 @@ public interface ArticleParserService {
      *
      * @param file JSON file with articles data.
      * @return ParsingResultDTO response containing list valid, and invalid articles.
-     * @throws FileParsingException for parsing error.
      */
     ParsingResultDTO parse(MultipartFile file);
 }
