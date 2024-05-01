@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReportArticlesRequestDTO {
-    private String titlePart;
+    private String title;
     private String field;
     private String authorId;
     private String journal;

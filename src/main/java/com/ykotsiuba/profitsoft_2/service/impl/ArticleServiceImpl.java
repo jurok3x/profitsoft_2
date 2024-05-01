@@ -14,9 +14,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -112,7 +110,10 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public SearchArticlesResponseDTO findBySearchParameters(SearchArticleRequestDTO requestDTO) {
         Pageable pageable = PageRequest.of(requestDTO.getPage(), requestDTO.getSize());
-        Page<Article> articlePage = articleRepository.search(requestDTO, pageable);
+        ExampleMatcher exampleMatcher = prepareExampleMatcher();
+        Example<Article> articleExample = Example.of(articleMapper.convertSearchRequestToEntity(requestDTO),
+                exampleMatcher);
+        Page<Article> articlePage = articleRepository.findAll(articleExample, pageable);
         int totalPages = articlePage.getTotalPages();
         log.info("Search request: {}. Pages found: {}.", requestDTO, totalPages);
         List<ArticleResponseDTO> list = articlePage.get()
@@ -127,12 +128,24 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public void generateReport(ReportArticlesRequestDTO requestDTO, HttpServletResponse response) {
         log.info("Generating report: {}", requestDTO);
-        List<Article> articles = articleRepository.report(requestDTO);
+        ExampleMatcher exampleMatcher = prepareExampleMatcher();
+        Example<Article> articleExample = Example.of(articleMapper.convertReportRequestToEntity(requestDTO),
+                exampleMatcher);
+        List<Article> articles = articleRepository.findAll(articleExample);
         List<ArticleResponseDTO> report = articles.stream()
                 .map(articleMapper::toResponseDTO)
                 .toList();
         byte[] bytes = reportService.writeReport(report);
         sendFileResponse(response, bytes);
+    }
+
+    private ExampleMatcher prepareExampleMatcher() {
+        ExampleMatcher exampleMatcher = ExampleMatcher.matchingAny()
+                .withMatcher("title", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
+                .withMatcher("journal", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
+                .withMatcher("author", ExampleMatcher.GenericPropertyMatchers.exact())
+                .withMatcher("field", ExampleMatcher.GenericPropertyMatchers.exact());
+        return exampleMatcher;
     }
 
     private static void sendFileResponse(HttpServletResponse response, byte[] bytes) {
