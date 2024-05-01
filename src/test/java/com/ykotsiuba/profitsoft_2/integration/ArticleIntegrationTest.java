@@ -6,7 +6,6 @@ import com.ykotsiuba.profitsoft_2.TestProfitsoft2Application;
 import com.ykotsiuba.profitsoft_2.dto.APIException;
 import com.ykotsiuba.profitsoft_2.dto.article.*;
 import com.ykotsiuba.profitsoft_2.entity.Article;
-import com.ykotsiuba.profitsoft_2.entity.enums.Field;
 import com.ykotsiuba.profitsoft_2.repository.ArticleRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
@@ -29,7 +28,8 @@ import static com.ykotsiuba.profitsoft_2.entity.enums.ArticleMessages.*;
 import static com.ykotsiuba.profitsoft_2.utils.EntitySource.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 

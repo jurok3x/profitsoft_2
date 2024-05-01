@@ -4,13 +4,9 @@ import com.ykotsiuba.profitsoft_2.dto.article.ArticleDTO;
 import com.ykotsiuba.profitsoft_2.dto.article.ArticleResponseDTO;
 import com.ykotsiuba.profitsoft_2.dto.article.ReportArticlesRequestDTO;
 import com.ykotsiuba.profitsoft_2.dto.article.SearchArticleRequestDTO;
-import com.ykotsiuba.profitsoft_2.dto.author.AuthorDTO;
 import com.ykotsiuba.profitsoft_2.entity.Article;
-import com.ykotsiuba.profitsoft_2.entity.enums.Field;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.UUID;
 
 import static com.ykotsiuba.profitsoft_2.utils.EntitySource.*;
 import static org.junit.jupiter.api.Assertions.*;
