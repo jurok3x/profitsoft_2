@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SearchArticleRequestDTO {
-    private String titlePart;
+    private String title;
     private String field;
     private String authorId;
     private String journal;

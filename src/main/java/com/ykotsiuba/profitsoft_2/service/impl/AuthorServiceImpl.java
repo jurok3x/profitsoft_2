@@ -52,7 +52,7 @@ public class AuthorServiceImpl implements AuthorService {
             log.error("Error saving author with email: {}", requestDTO.getEmail());
             throw new IllegalArgumentException(String.format(AUTHOR_ALREADY_EXISTS.getMessage(), requestDTO.getEmail()));
         }
-        Author authorRequest = authorMapper.convertFromUploadDTO(requestDTO);
+        Author authorRequest = authorMapper.convertSaveRequestToEntity(requestDTO);
         Author savedAuthor = authorRepository.save(authorRequest);
         log.info("Saving author: {}", savedAuthor);
         return authorMapper.toDTO(savedAuthor);
@@ -73,7 +73,7 @@ public class AuthorServiceImpl implements AuthorService {
                 throw new IllegalArgumentException(AUTHOR_UPDATE_ERROR.getMessage());
             }
         }
-        Author authorRequest = authorMapper.convertFromUploadDTO(requestDTO);
+        Author authorRequest = authorMapper.convertSaveRequestToEntity(requestDTO);
         authorRequest.setId(author.getId());
         authorRequest.setArticles(author.getArticles());
         Author updatedAuthor = authorRepository.save(authorRequest);

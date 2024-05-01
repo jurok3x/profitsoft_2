@@ -1,4 +1,4 @@
-package com.ykotsiuba.profitsoft_2.controller;
+package com.ykotsiuba.profitsoft_2.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ykotsiuba.profitsoft_2.Profitsoft2Application;
@@ -39,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestProfitsoft2Application.class)
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-class ArticleControllerTest {
+class ArticleIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -248,16 +248,16 @@ class ArticleControllerTest {
 
     @Test
     public void testUpload_invalidFile() throws Exception {
-        MockMultipartFile plainTextFile
+        MockMultipartFile emptyFile
                 = new MockMultipartFile(
                 "file",
-                "file.txt",
-                MediaType.TEXT_PLAIN_VALUE,
-                "Hello world".getBytes()
+                "file.json",
+                MediaType.APPLICATION_JSON_VALUE,
+                new byte[]{}
         );
 
         MvcResult mvcResult = mvc.perform(multipart(UPLOAD_URL)
-                        .file(plainTextFile)
+                        .file(emptyFile)
                 )
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))

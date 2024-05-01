@@ -14,6 +14,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -157,13 +158,13 @@ class ArticleServiceImplTest {
         SearchArticleRequestDTO requestDTO = prepareSearchRequest();
         Pageable pageRequest = PageRequest.of(0, 10);
         Page<Article> page = prepareTestPage(pageRequest);
-        when(articleRepository.search(any(SearchArticleRequestDTO.class), any(Pageable.class))).thenReturn(page);
+        when(articleRepository.findAll(any(Example.class), any(Pageable.class))).thenReturn(page);
 
         SearchArticlesResponseDTO responseDTO = articleService.findBySearchParameters(requestDTO);
 
         assertNotNull(responseDTO);
         assertFalse(responseDTO.getList().isEmpty());
-        verify(articleRepository).search(any(SearchArticleRequestDTO.class), any(Pageable.class));
+        verify(articleRepository).findAll(any(Example.class), any(Pageable.class));
     }
 
     @Test
@@ -172,12 +173,12 @@ class ArticleServiceImplTest {
         List<Article> articles = Arrays.asList(prepareArticle());
         byte[] bytes = {};
         when(reportService.writeReport(any())).thenReturn(bytes);
-        when(articleRepository.report(any(ReportArticlesRequestDTO.class))).thenReturn(articles);
+        when(articleRepository.findAll(any(Example.class))).thenReturn(articles);
 
         MockHttpServletResponse response = new MockHttpServletResponse();
         articleService.generateReport(requestDTO, response);
 
-        verify(articleRepository).report(any(ReportArticlesRequestDTO.class));
+        verify(articleRepository).findAll(any(Example.class));
         verify(reportService).writeReport(any());
     }
 

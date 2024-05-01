@@ -1,6 +1,7 @@
 package com.ykotsiuba.profitsoft_2.utils;
 
 import com.ykotsiuba.profitsoft_2.dto.article.*;
+import com.ykotsiuba.profitsoft_2.dto.author.AuthorDTO;
 import com.ykotsiuba.profitsoft_2.dto.author.SaveAuthorRequestDTO;
 import com.ykotsiuba.profitsoft_2.entity.Article;
 import com.ykotsiuba.profitsoft_2.entity.Author;
@@ -50,6 +51,26 @@ public class EntitySource {
                 .build();
     }
 
+    public static ArticleDTO prepareArticleDTO() {
+        return ArticleDTO.builder()
+                .id(UUID.randomUUID())
+                .authorDTO(new AuthorDTO())
+                .title("Title")
+                .field(Field.PHYSICS)
+                .year(2020)
+                .journal("Journal")
+                .build();
+    }
+
+    public static AuthorDTO prepareAuthorDTO() {
+        return AuthorDTO.builder()
+                .id(UUID.randomUUID())
+                .firstName("Keanu")
+                .lastName("Reeves")
+                .email("kreeves@example.com")
+                .build();
+    }
+
     public static SaveArticleRequestDTO prepareSaveArticleRequest() {
         return SaveArticleRequestDTO.builder()
                 .title("Lasers in our world")
@@ -64,7 +85,7 @@ public class EntitySource {
         return SearchArticleRequestDTO.builder()
                 .page(0)
                 .size(10)
-                .titlePart("quantum")
+                .title("quantum")
                 .authorId("00000000-0000-0000-0000-000000000001")
                 .field("PHYSICS")
                 .journal("Physics Today")
@@ -74,7 +95,7 @@ public class EntitySource {
 
     public static ReportArticlesRequestDTO prepareReportRequest() {
         return ReportArticlesRequestDTO.builder()
-                .titlePart("quantum")
+                .title("quantum")
                 .authorId("00000000-0000-0000-0000-000000000001")
                 .field("PHYSICS")
                 .journal("Physics Today")
