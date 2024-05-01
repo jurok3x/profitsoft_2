@@ -1,4 +1,4 @@
-package com.ykotsiuba.profitsoft_2.controller;
+package com.ykotsiuba.profitsoft_2.integration;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -45,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestProfitsoft2Application.class)
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-class AuthorControllerTest {
+class AuthorIntegrationTest {
 
     private static final ObjectMapper DEFAULT_MAPPER;
 

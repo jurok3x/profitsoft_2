@@ -1,4 +1,4 @@
-package com.ykotsiuba.profitsoft_2.controller;
+package com.ykotsiuba.profitsoft_2.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ykotsiuba.profitsoft_2.Profitsoft2Application;
@@ -6,6 +6,7 @@ import com.ykotsiuba.profitsoft_2.TestProfitsoft2Application;
 import com.ykotsiuba.profitsoft_2.dto.APIException;
 import com.ykotsiuba.profitsoft_2.dto.article.*;
 import com.ykotsiuba.profitsoft_2.entity.Article;
+import com.ykotsiuba.profitsoft_2.entity.enums.Field;
 import com.ykotsiuba.profitsoft_2.repository.ArticleRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
@@ -28,8 +29,7 @@ import static com.ykotsiuba.profitsoft_2.entity.enums.ArticleMessages.*;
 import static com.ykotsiuba.profitsoft_2.utils.EntitySource.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -39,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestProfitsoft2Application.class)
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-class ArticleControllerTest {
+class ArticleIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -248,16 +248,16 @@ class ArticleControllerTest {
 
     @Test
     public void testUpload_invalidFile() throws Exception {
-        MockMultipartFile plainTextFile
+        MockMultipartFile emptyFile
                 = new MockMultipartFile(
                 "file",
-                "file.txt",
-                MediaType.TEXT_PLAIN_VALUE,
-                "Hello world".getBytes()
+                "file.json",
+                MediaType.APPLICATION_JSON_VALUE,
+                new byte[]{}
         );
 
         MvcResult mvcResult = mvc.perform(multipart(UPLOAD_URL)
-                        .file(plainTextFile)
+                        .file(emptyFile)
                 )
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
