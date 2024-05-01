@@ -1,10 +1,7 @@
 package com.ykotsiuba.profitsoft_2.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.util.List;
@@ -32,6 +29,8 @@ public class Author {
     @Column(name = "last_name", columnDefinition = "varchar(50)")
     private String lastName;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "author")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "author")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private List<Article> articles;
 }
