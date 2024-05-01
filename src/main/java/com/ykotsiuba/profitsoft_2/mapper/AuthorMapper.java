@@ -11,7 +11,7 @@ public interface AuthorMapper {
     Author toEntity(AuthorDTO authorDTO);
 
     @Mapping(target = "id", ignore = true)
-    Author fromSaveRequestToEntity(SaveAuthorRequestDTO requestDTO);
+    Author convertFromUploadDTO(SaveAuthorRequestDTO requestDTO);
 
     AuthorDTO toDTO(Author author);
 }
