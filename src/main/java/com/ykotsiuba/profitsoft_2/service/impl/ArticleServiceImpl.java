@@ -13,6 +13,7 @@ import com.ykotsiuba.profitsoft_2.service.ReportGenerationService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +32,7 @@ import static com.ykotsiuba.profitsoft_2.entity.enums.AuthorMessages.AUTHOR_NOT_
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ArticleServiceImpl implements ArticleService {
 
     private static final String FILENAME_HEADER = "attachment; filename=articles.xlsx";
@@ -49,6 +51,7 @@ public class ArticleServiceImpl implements ArticleService {
     public ArticleDTO save(SaveArticleRequestDTO requestDTO) {
         Article articleRequest = convertFromSaveRequestDTO(requestDTO);
         Article savedArticle = articleRepository.save(articleRequest);
+        log.info("Saving article: {}", savedArticle);
         return articleMapper.toDTO(savedArticle);
     }
 
@@ -64,19 +67,26 @@ public class ArticleServiceImpl implements ArticleService {
 
     private Author findAuthor(String id) {
         Optional<Author> optionalAuthor = authorRepository.findById(UUID.fromString(id));
+        if(optionalAuthor.isEmpty()) {
+            log.error("Article author not found for id: {}", id);
+        }
         return optionalAuthor.orElseThrow(() -> new EntityNotFoundException(String.format(AUTHOR_NOT_FOUND.getMessage(), id)));
     }
 
     @Override
     public ArticleDTO findById(String id) {
         Article article = findOrThrow(id);
+        log.info("Found article with id: {}", id);
         return articleMapper.toDTO(article);
     }
 
     private Article findOrThrow(String id) {
         UUID uuid = UUID.fromString(id);
-        Optional<Article> optionalAuthor = articleRepository.findById(uuid);
-        return optionalAuthor.orElseThrow(() -> new EntityNotFoundException(String.format(ARTICLE_NOT_FOUND.getMessage(), id)));
+        Optional<Article> optionalArticle = articleRepository.findById(uuid);
+        if(optionalArticle.isEmpty()) {
+            log.error("Article not found for id: {}", id);
+        }
+        return optionalArticle.orElseThrow(() -> new EntityNotFoundException(String.format(ARTICLE_NOT_FOUND.getMessage(), id)));
     }
 
     @Override
@@ -85,6 +95,7 @@ public class ArticleServiceImpl implements ArticleService {
         Article articleRequest = convertFromSaveRequestDTO(requestDTO);
         articleRequest.setId(article.getId());
         Article updatedArticle = articleRepository.save(articleRequest);
+        log.info("Updating article: {}", updatedArticle);
         return articleMapper.toDTO(updatedArticle);
     }
 
@@ -92,6 +103,7 @@ public class ArticleServiceImpl implements ArticleService {
     public DeleteArticleResponseDTO delete(String id) {
         Article article = findOrThrow(id);
         articleRepository.delete(article);
+        log.info("Deleting article with id: {}", id);
         return DeleteArticleResponseDTO.builder()
                 .message(ARTICLE_DELETED.getMessage())
                 .build();
@@ -102,6 +114,7 @@ public class ArticleServiceImpl implements ArticleService {
         Pageable pageable = PageRequest.of(requestDTO.getPage(), requestDTO.getSize());
         Page<Article> articlePage = articleRepository.search(requestDTO, pageable);
         int totalPages = articlePage.getTotalPages();
+        log.info("Search request: {}. Pages found: {}.", requestDTO, totalPages);
         List<ArticleResponseDTO> list = articlePage.get()
                 .map(articleMapper::toResponseDTO)
                 .toList();
@@ -113,6 +126,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public void generateReport(ReportArticlesRequestDTO requestDTO, HttpServletResponse response) {
+        log.info("Generating report: {}", requestDTO);
         List<Article> articles = articleRepository.report(requestDTO);
         List<ArticleResponseDTO> report = articles.stream()
                 .map(articleMapper::toResponseDTO)
@@ -128,13 +142,16 @@ public class ArticleServiceImpl implements ArticleService {
             response.getOutputStream().write(bytes);
             response.getOutputStream().flush();
         } catch (IOException e) {
+            log.error("Can not send file report");
             throw new RuntimeException(e);
         }
     }
 
     @Override
     public UploadArticlesResponseDTO upload(MultipartFile file) {
+        log.error("Uploading Json file...");
         if(file.isEmpty() || file.getContentType() != MediaType.APPLICATION_JSON_VALUE) {
+            log.error("Invalid file");
             throw new IllegalArgumentException(FILE_NOT_VALID.getMessage());
         }
 
@@ -144,9 +161,12 @@ public class ArticleServiceImpl implements ArticleService {
                 .map(this::convertFromUploadDTO)
                 .toList();
         List<Article> saved = articleRepository.saveAll(articles);
+        int savedCount = saved.size();
+        int errorsCount = resultDTO.getTotalCount() - savedCount;
+        log.error("Saved: {}. Errors: {}.", savedCount, errorsCount);
         return UploadArticlesResponseDTO.builder()
-                .uploaded(saved.size())
-                .errors(resultDTO.getTotalCount() - saved.size())
+                .uploaded(savedCount)
+                .errors(errorsCount)
                 .build();
     }
 

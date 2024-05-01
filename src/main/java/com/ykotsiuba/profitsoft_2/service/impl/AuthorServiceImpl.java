@@ -9,6 +9,7 @@ import com.ykotsiuba.profitsoft_2.repository.AuthorRepository;
 import com.ykotsiuba.profitsoft_2.service.AuthorService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,21 +20,12 @@ import static com.ykotsiuba.profitsoft_2.entity.enums.AuthorMessages.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthorServiceImpl implements AuthorService {
 
     private final AuthorRepository authorRepository;
 
     private  final AuthorMapper authorMapper;
-
-    @Override
-    public Optional<Author> findById(String id) {
-        return authorRepository.findById(UUID.fromString(id));
-    }
-
-    @Override
-    public Optional<Author> findByEmail(String email) {
-        return authorRepository.findByEmail(email);
-    }
 
     @Override
     public List<AuthorDTO> findAll() {
@@ -44,8 +36,12 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     private Author findOrThrow(String id) {
+        log.info("Searching author with id: {}", id);
         UUID uuid = UUID.fromString(id);
         Optional<Author> optionalAuthor = authorRepository.findById(uuid);
+        if(optionalAuthor.isEmpty()){
+            log.error("Author with id {} not found", id);
+        }
         return optionalAuthor.orElseThrow(() -> new EntityNotFoundException(String.format(AUTHOR_NOT_FOUND.getMessage(), id)));
     }
 
@@ -53,18 +49,18 @@ public class AuthorServiceImpl implements AuthorService {
     public AuthorDTO save(SaveAuthorRequestDTO requestDTO) {
         Optional<Author> byEmail = findByEmail(requestDTO.getEmail());
         if(byEmail.isPresent()) {
+            log.error("Error saving author with email: {}", requestDTO.getEmail());
             throw new IllegalArgumentException(String.format(AUTHOR_ALREADY_EXISTS.getMessage(), requestDTO.getEmail()));
         }
-        Author authorRequest = prepareAuthor(requestDTO);
+        Author authorRequest = authorMapper.convertFromUploadDTO(requestDTO);
         Author savedAuthor = authorRepository.save(authorRequest);
+        log.info("Saving author: {}", savedAuthor);
         return authorMapper.toDTO(savedAuthor);
     }
 
-    private Author prepareAuthor(SaveAuthorRequestDTO requestDTO) {
-        return Author.builder()
-                .firstName(requestDTO.getFirstName())
-                .lastName(requestDTO.getLastName())
-                .build();
+    private Optional<Author> findByEmail(String email) {
+        log.info("Searching author with email: {}", email);
+        return authorRepository.findByEmail(email);
     }
 
     @Override
@@ -73,13 +69,15 @@ public class AuthorServiceImpl implements AuthorService {
         Optional<Author> byEmail = findByEmail(requestDTO.getEmail());
         if(byEmail.isPresent()) {
             if(!author.getEmail().equals(byEmail.get().getEmail())) {
+                log.error("Error updating author with email: {}", requestDTO.getEmail());
                 throw new IllegalArgumentException(AUTHOR_UPDATE_ERROR.getMessage());
             }
         }
-        Author authorRequest = prepareAuthor(requestDTO);
+        Author authorRequest = authorMapper.convertFromUploadDTO(requestDTO);
         authorRequest.setId(author.getId());
         authorRequest.setArticles(author.getArticles());
         Author updatedAuthor = authorRepository.save(authorRequest);
+        log.info("Updating author: {}", updatedAuthor);
         return authorMapper.toDTO(updatedAuthor);
     }
 
@@ -89,6 +87,7 @@ public class AuthorServiceImpl implements AuthorService {
         authorRepository.delete(author);
         DeleteAuthorResponseDTO responseDTO = new DeleteAuthorResponseDTO();
         responseDTO.setMessage(AUTHOR_DELETED.getMessage());
+        log.info("Deleting author with id {}", id);
         return responseDTO;
     }
 }

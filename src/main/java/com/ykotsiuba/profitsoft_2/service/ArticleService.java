@@ -57,5 +57,12 @@ public interface ArticleService {
      */
     void generateReport(ReportArticlesRequestDTO requestDTO, HttpServletResponse response);
 
+    /**
+     * Reads JSON file and saves valid articles to the database.
+     *
+     * @param file JSON file with articles data.
+     * @return UploadArticlesResponseDTO response containing count of saved articles, and articles with invalid fields or when user not exists.
+     * @throws IllegalArgumentException if received not JSON file.
+     */
     UploadArticlesResponseDTO upload(MultipartFile file);
 }

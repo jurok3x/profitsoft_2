@@ -48,29 +48,6 @@ class AuthorServiceImplTest {
     }
 
     @Test
-    void whenFindById_thenReturnCorrectAuthor() {
-        Author author = prepareAuthor();
-        when(authorRepository.findById(any(UUID.class))).thenReturn(Optional.of(author));
-
-        Optional<Author> response = authorService.findById(UUID.randomUUID().toString());
-
-        assertFalse(response.isEmpty());
-        assertEquals(author.getFirstName(), response.get().getFirstName());
-        verify(authorRepository).findById(any(UUID.class));
-    }
-
-    @Test
-    void whenFindByEmail_thenReturnCorrectAuthor() {
-        Author author = prepareAuthor();
-        when(authorRepository.findByEmail(any(String.class))).thenReturn(Optional.of(author));
-
-        Optional<Author> response = authorService.findByEmail("email@example.com");
-
-        assertFalse(response.isEmpty());
-        verify(authorRepository).findByEmail(any(String.class));
-    }
-
-    @Test
     void whenFindAll_thenReturnCorrectAuthors() {
         List<Author> authors = Arrays.asList(prepareAuthor());
         when(authorRepository.findAll()).thenReturn(authors);
