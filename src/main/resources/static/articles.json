@@ -1,0 +1,72 @@
+[
+  {
+    "title": "Title 0",
+    "field": "ASTRONOMY",
+    "authorId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+    "year": 2018,
+    "journal": "Journal 0"
+  },
+  {
+    "title": "Title 1",
+    "field": "ASTRONOMY",
+    "authorId": "7b902bc4-43fd-4a13-95b9-681009c21256",
+    "year": 2023,
+    "journal": "Journal 1"
+  },
+  {
+    "title": "Title 2",
+    "field": "PSYCHOLOGY",
+    "authorId": "00000000-0000-0000-0000-000000000003",
+    "year": 2027,
+    "journal": "Journal 2"
+  },
+  {
+    "title": "Title 3",
+    "field": "LITERATURE",
+    "authorId": "c49ee8f8-d8dc-4483-83eb-5712025b7730",
+    "year": 2021,
+    "journal": "Journal 3"
+  },
+  {
+    "title": "Title 4",
+    "field": "CHEMISTRY",
+    "authorId": "00000000-0000-0000-0000-000000000003",
+    "year": 2022,
+    "journal": ""
+  },
+  {
+    "title": "",
+    "field": "CHEMISTRY",
+    "authorId": "00000000-0000-0000-0000-000000000004",
+    "year": 2020,
+    "journal": "Journal 5"
+  },
+  {
+    "title": "Title 6",
+    "authorId": "00000000-0000-0000-0000-000000000002",
+    "year": 2019,
+    "journal": "Journal 6"
+  },
+  {
+    "title": "Title 7",
+    "field": "BIOLOGY",
+    "authorId": "00000000-0000-0000-0000-000000000001",
+    "year": 2019,
+    "journal": "Journal 7",
+    "error": "error"
+  },
+  {
+    "title": "Title 8",
+    "field": "PHYSICS123",
+    "authorId": "00000000-0000-0000-0000-000000000001",
+    "year": 2010,
+    "journal": "Journal 8"
+  },
+  {
+    "title": "Title 9",
+    "field": "",
+    "authorId": "00000000-0000-0000-0000-000000000002",
+    "year": 2021,
+    "journal": "Journal 9"
+  }
+]

@@ -55,7 +55,7 @@ public class ArticleController {
         service.generateReport(requestDTO, response);
     }
 
-    @PostMapping(value = "/upload")
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UploadArticlesResponseDTO> upload(@RequestParam("file") MultipartFile multipart) {
         UploadArticlesResponseDTO responseDTO = service.upload(multipart);
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);

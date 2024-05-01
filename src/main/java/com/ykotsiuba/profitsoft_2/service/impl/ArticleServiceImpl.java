@@ -150,7 +150,7 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public UploadArticlesResponseDTO upload(MultipartFile file) {
         log.error("Uploading Json file...");
-        if(file.isEmpty() || file.getContentType() != MediaType.APPLICATION_JSON_VALUE) {
+        if(file.isEmpty()) {
             log.error("Invalid file");
             throw new IllegalArgumentException(FILE_NOT_VALID.getMessage());
         }
@@ -163,7 +163,7 @@ public class ArticleServiceImpl implements ArticleService {
         List<Article> saved = articleRepository.saveAll(articles);
         int savedCount = saved.size();
         int errorsCount = resultDTO.getTotalCount() - savedCount;
-        log.error("Saved: {}. Errors: {}.", savedCount, errorsCount);
+        log.error("Saved articles: {}. Errors: {}.", savedCount, errorsCount);
         return UploadArticlesResponseDTO.builder()
                 .uploaded(savedCount)
                 .errors(errorsCount)
@@ -172,6 +172,9 @@ public class ArticleServiceImpl implements ArticleService {
 
     private boolean validateArticleRequest(UploadArticleRequestDTO requestDTO) {
         Optional<Author> optionalAuthor = authorRepository.findById(UUID.fromString(requestDTO.getAuthorId()));
+        if(optionalAuthor.isEmpty()) {
+            log.error("Uploaded author not found for id: {}", requestDTO.getAuthorId());
+        }
         return optionalAuthor.isPresent();
     }
 
