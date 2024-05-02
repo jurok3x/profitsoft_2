@@ -143,7 +143,7 @@ public class ArticleServiceImpl implements ArticleService {
         ExampleMatcher exampleMatcher = ExampleMatcher.matchingAny()
                 .withMatcher("title", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
                 .withMatcher("journal", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
-                .withMatcher("author", ExampleMatcher.GenericPropertyMatchers.exact())
+                .withMatcher("author", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
                 .withMatcher("field", ExampleMatcher.GenericPropertyMatchers.exact());
         return exampleMatcher;
     }
