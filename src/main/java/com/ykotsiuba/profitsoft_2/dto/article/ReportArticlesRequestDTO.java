@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class ReportArticlesRequestDTO {
     private String title;
     private String field;
-    private String authorId;
+    private String authorLastName;
     private String journal;
     private Integer year;
 }

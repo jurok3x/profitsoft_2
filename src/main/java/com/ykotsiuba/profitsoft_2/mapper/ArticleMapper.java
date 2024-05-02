@@ -9,8 +9,6 @@ import com.ykotsiuba.profitsoft_2.entity.Author;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import java.util.UUID;
-
 @Mapper(componentModel = "spring")
 public interface ArticleMapper {
 
@@ -37,20 +35,20 @@ public interface ArticleMapper {
     }
 
     default Author mapReportAuthorId(ReportArticlesRequestDTO articleDTO) {
-        if(articleDTO.getAuthorId() == null) {
+        if(articleDTO.getAuthorLastName() == null) {
             return null;
         }
         return Author.builder()
-                .id(UUID.fromString(articleDTO.getAuthorId()))
+                .lastName(articleDTO.getAuthorLastName())
                 .build();
     }
 
     default Author mapSearchAuthorId(SearchArticleRequestDTO articleDTO) {
-        if(articleDTO.getAuthorId() == null) {
+        if(articleDTO.getAuthorLastName() == null) {
             return null;
         }
         return Author.builder()
-                .id(UUID.fromString(articleDTO.getAuthorId()))
+                .lastName(articleDTO.getAuthorLastName())
                 .build();
     }
 }
