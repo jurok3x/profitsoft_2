@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class SearchArticleRequestDTO {
     private String title;
     private String field;
-    private String authorLastName;
+    private String authorId;
     private String journal;
     private Integer year;
 

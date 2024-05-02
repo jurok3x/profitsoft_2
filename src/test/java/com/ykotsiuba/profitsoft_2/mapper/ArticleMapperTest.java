@@ -35,7 +35,7 @@ class ArticleMapperTest {
     @Test
     void convertReportRequestToEntity() {
         ReportArticlesRequestDTO requestDTO = prepareReportRequest();
-        requestDTO.setAuthorLastName(null);
+        requestDTO.setAuthorId(null);
         Article article = mapper.convertReportRequestToEntity(requestDTO);
         assertTrue(article.getClass().isAssignableFrom(Article.class));
         assertNull(article.getId());
@@ -49,7 +49,7 @@ class ArticleMapperTest {
     @Test
     void convertSearchRequestToEntity() {
         SearchArticleRequestDTO requestDTO = prepareSearchRequest();
-        requestDTO.setAuthorLastName(null);
+        requestDTO.setAuthorId(null);
         Article article = mapper.convertSearchRequestToEntity(requestDTO);
         assertTrue(article.getClass().isAssignableFrom(Article.class));
         assertNull(article.getId());
