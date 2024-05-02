@@ -86,7 +86,7 @@ public class EntitySource {
                 .page(0)
                 .size(10)
                 .title("quantum")
-                .authorLastName("Doe")
+                .authorId("00000000-0000-0000-0000-000000000001")
                 .field("PHYSICS")
                 .journal("Physics Today")
                 .year(2020)
@@ -96,7 +96,7 @@ public class EntitySource {
     public static ReportArticlesRequestDTO prepareReportRequest() {
         return ReportArticlesRequestDTO.builder()
                 .title("quantum")
-                .authorLastName("doe")
+                .authorId("00000000-0000-0000-0000-000000000001")
                 .field("PHYSICS")
                 .journal("Physics Today")
                 .year(2020)
