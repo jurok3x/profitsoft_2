@@ -38,8 +38,8 @@ public class ArticleController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<DeleteArticleResponseDTO> delete(@PathVariable String id) {
-        DeleteArticleResponseDTO responseDTO = service.delete(id);
+    public ResponseEntity<ArticleDTO> delete(@PathVariable String id) {
+        ArticleDTO responseDTO = service.delete(id);
         return ResponseEntity.ok(responseDTO);
     }
 
