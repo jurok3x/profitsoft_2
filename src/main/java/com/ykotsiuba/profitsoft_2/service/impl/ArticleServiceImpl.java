@@ -5,6 +5,7 @@ import com.ykotsiuba.profitsoft_2.entity.Article;
 import com.ykotsiuba.profitsoft_2.entity.Author;
 import com.ykotsiuba.profitsoft_2.entity.enums.Field;
 import com.ykotsiuba.profitsoft_2.mapper.ArticleMapper;
+import com.ykotsiuba.profitsoft_2.producer.ArticleProducer;
 import com.ykotsiuba.profitsoft_2.repository.ArticleRepository;
 import com.ykotsiuba.profitsoft_2.repository.AuthorRepository;
 import com.ykotsiuba.profitsoft_2.service.ArticleParserService;
@@ -12,6 +13,7 @@ import com.ykotsiuba.profitsoft_2.service.ArticleService;
 import com.ykotsiuba.profitsoft_2.service.ReportGenerationService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
@@ -37,6 +39,8 @@ public class ArticleServiceImpl implements ArticleService {
 
     private final ArticleRepository articleRepository;
 
+    private final ArticleProducer producer;
+
     private final AuthorRepository authorRepository;
 
     private final ArticleMapper articleMapper;
@@ -50,6 +54,7 @@ public class ArticleServiceImpl implements ArticleService {
         Article articleRequest = convertFromSaveRequestDTO(requestDTO);
         Article savedArticle = articleRepository.save(articleRequest);
         log.info("Saving article: {}", savedArticle);
+        producer.sendReport(savedArticle);
         return articleMapper.toDTO(savedArticle);
     }
 
@@ -98,13 +103,15 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public DeleteArticleResponseDTO delete(String id) {
+    public ArticleDTO delete(String id) {
         Article article = findOrThrow(id);
-        articleRepository.delete(article);
+        Optional<Article> optionalArticle1 = articleRepository.findById(article.getId());
+        log.info("Present {}", optionalArticle1.isPresent());
+        articleRepository.deleteById(article.getId());
+        Optional<Article> optionalArticle = articleRepository.findById(article.getId());
+        log.info("Present {}", optionalArticle.isPresent());
         log.info("Deleting article with id: {}", id);
-        return DeleteArticleResponseDTO.builder()
-                .message(ARTICLE_DELETED.getMessage())
-                .build();
+        return articleMapper.toDTO(article);
     }
 
     @Override
@@ -140,7 +147,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     private ExampleMatcher prepareExampleMatcher() {
-        ExampleMatcher exampleMatcher = ExampleMatcher.matchingAny()
+        ExampleMatcher exampleMatcher = ExampleMatcher.matchingAll()
                 .withMatcher("title", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
                 .withMatcher("journal", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
                 .withMatcher("author", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
