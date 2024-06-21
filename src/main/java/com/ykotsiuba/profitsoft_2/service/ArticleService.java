@@ -40,7 +40,7 @@ public interface ArticleService {
      * @return The response DTO indicating the deletion status.
      * @throws jakarta.persistence.EntityNotFoundException if article not found.
      */
-    DeleteArticleResponseDTO delete(String id);
+    ArticleDTO delete(String id);
 
     /**
      * Searches for articles based on search parameters.

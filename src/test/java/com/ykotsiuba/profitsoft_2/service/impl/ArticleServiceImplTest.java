@@ -5,6 +5,7 @@ import com.ykotsiuba.profitsoft_2.entity.Article;
 import com.ykotsiuba.profitsoft_2.entity.Author;
 import com.ykotsiuba.profitsoft_2.mapper.ArticleMapper;
 import com.ykotsiuba.profitsoft_2.mapper.ArticleMapperImpl;
+import com.ykotsiuba.profitsoft_2.producer.ArticleProducer;
 import com.ykotsiuba.profitsoft_2.repository.ArticleRepository;
 import com.ykotsiuba.profitsoft_2.repository.AuthorRepository;
 import com.ykotsiuba.profitsoft_2.service.ArticleParserService;
@@ -43,6 +44,8 @@ class ArticleServiceImplTest {
 
     private ArticleMapper articleMapper;
 
+    private ArticleProducer producer;
+
     private ReportGenerationService reportService;
 
     private ArticleParserService parserService;
@@ -54,7 +57,8 @@ class ArticleServiceImplTest {
         authorRepository = mock(AuthorRepository.class);
         articleMapper = new ArticleMapperImpl();
         parserService = mock(ArticleParserServiceImpl.class);
-        articleService = new ArticleServiceImpl(articleRepository, authorRepository, articleMapper, reportService, parserService);
+        producer = mock(ArticleProducer.class);
+        articleService = new ArticleServiceImpl(articleRepository, producer, authorRepository,  articleMapper,  reportService,  parserService);
     }
 
     @AfterEach
@@ -67,6 +71,7 @@ class ArticleServiceImplTest {
         Article article = prepareArticle();
         Author author = prepareAuthor();
         SaveArticleRequestDTO requestDTO = prepareSaveArticleRequest();
+        doNothing().when(producer).sendReport(any());
         when(articleRepository.save(any(Article.class))).thenReturn(article);
         when(authorRepository.findById(any(UUID.class))).thenReturn(Optional.of(author));
 
@@ -145,11 +150,10 @@ class ArticleServiceImplTest {
         doNothing().when(articleRepository).delete(any(Article.class));
         when(articleRepository.findById(any(UUID.class))).thenReturn(Optional.ofNullable(article));
 
-        DeleteArticleResponseDTO responseDTO = articleService.delete(UUID.randomUUID().toString());
+        ArticleDTO responseDTO = articleService.delete(UUID.randomUUID().toString());
 
         assertNotNull(responseDTO);
-        assertEquals(ARTICLE_DELETED.getMessage(), responseDTO.getMessage());
-        verify(articleRepository).delete(any(Article.class));
+        verify(articleRepository).deleteById(any());
         verify(articleRepository).findById(any(UUID.class));
     }
 

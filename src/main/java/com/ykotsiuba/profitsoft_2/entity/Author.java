@@ -33,4 +33,8 @@ public class Author {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private List<Article> articles;
+
+    public void dismissArticle(Article article) {
+        this.articles.remove(article);
+    }
 }

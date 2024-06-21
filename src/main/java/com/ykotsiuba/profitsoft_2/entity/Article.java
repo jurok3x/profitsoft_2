@@ -39,4 +39,10 @@ public class Article {
 
     @Column(name = "title", columnDefinition = "varchar(50)")
     private String title;
+
+    @PreRemove
+    public void dismissAuthor() {
+        this.author.dismissArticle(this);
+        this.author = null;
+    }
 }

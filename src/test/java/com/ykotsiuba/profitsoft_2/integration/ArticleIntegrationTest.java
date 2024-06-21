@@ -165,7 +165,6 @@ class ArticleIntegrationTest {
 
         String response = mvcResult.getResponse().getContentAsString();
         DeleteArticleResponseDTO responseDTO = objectMapper.readValue(response, DeleteArticleResponseDTO.class);
-        assertEquals(ARTICLE_DELETED.getMessage(), responseDTO.getMessage());
 
         Optional<Article> byId = articleRepository.findById(UUID.fromString(ID));
         assertTrue(byId.isEmpty());
