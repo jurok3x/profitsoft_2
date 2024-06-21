@@ -105,11 +105,7 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public ArticleDTO delete(String id) {
         Article article = findOrThrow(id);
-        Optional<Article> optionalArticle1 = articleRepository.findById(article.getId());
-        log.info("Present {}", optionalArticle1.isPresent());
         articleRepository.deleteById(article.getId());
-        Optional<Article> optionalArticle = articleRepository.findById(article.getId());
-        log.info("Present {}", optionalArticle.isPresent());
         log.info("Deleting article with id: {}", id);
         return articleMapper.toDTO(article);
     }

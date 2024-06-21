@@ -22,7 +22,7 @@ public class ArticleProducer {
     public void sendReport(Article article) {
         EmailMessageDto data = EmailMessageDto.builder()
                 .to(article.getAuthor().getEmail())
-                .text(String.format("Congratulations you have published article %s.", article.getTitle()))
+                .content(String.format("Congratulations you have published article %s.", article.getTitle()))
                 .subject("New article")
                 .build();
         operations.send(articleTopic, UUID.randomUUID().toString(), data);

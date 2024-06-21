@@ -11,5 +11,5 @@ public class EmailMessageDto {
 
     private String subject;
 
-    private String text;
+    private String content;
 }
