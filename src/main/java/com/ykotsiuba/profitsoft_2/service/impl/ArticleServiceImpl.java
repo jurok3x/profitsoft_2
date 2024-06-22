@@ -5,7 +5,6 @@ import com.ykotsiuba.profitsoft_2.entity.Article;
 import com.ykotsiuba.profitsoft_2.entity.Author;
 import com.ykotsiuba.profitsoft_2.entity.enums.Field;
 import com.ykotsiuba.profitsoft_2.mapper.ArticleMapper;
-import com.ykotsiuba.profitsoft_2.producer.ArticleProducer;
 import com.ykotsiuba.profitsoft_2.repository.ArticleRepository;
 import com.ykotsiuba.profitsoft_2.repository.AuthorRepository;
 import com.ykotsiuba.profitsoft_2.service.ArticleParserService;
@@ -13,7 +12,6 @@ import com.ykotsiuba.profitsoft_2.service.ArticleService;
 import com.ykotsiuba.profitsoft_2.service.ReportGenerationService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
@@ -39,8 +37,6 @@ public class ArticleServiceImpl implements ArticleService {
 
     private final ArticleRepository articleRepository;
 
-    private final ArticleProducer producer;
-
     private final AuthorRepository authorRepository;
 
     private final ArticleMapper articleMapper;
@@ -54,7 +50,6 @@ public class ArticleServiceImpl implements ArticleService {
         Article articleRequest = convertFromSaveRequestDTO(requestDTO);
         Article savedArticle = articleRepository.save(articleRequest);
         log.info("Saving article: {}", savedArticle);
-        producer.sendReport(savedArticle);
         return articleMapper.toDTO(savedArticle);
     }
 

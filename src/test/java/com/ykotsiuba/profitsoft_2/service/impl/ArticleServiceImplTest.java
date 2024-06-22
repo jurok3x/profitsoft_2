@@ -5,7 +5,6 @@ import com.ykotsiuba.profitsoft_2.entity.Article;
 import com.ykotsiuba.profitsoft_2.entity.Author;
 import com.ykotsiuba.profitsoft_2.mapper.ArticleMapper;
 import com.ykotsiuba.profitsoft_2.mapper.ArticleMapperImpl;
-import com.ykotsiuba.profitsoft_2.producer.ArticleProducer;
 import com.ykotsiuba.profitsoft_2.repository.ArticleRepository;
 import com.ykotsiuba.profitsoft_2.repository.AuthorRepository;
 import com.ykotsiuba.profitsoft_2.service.ArticleParserService;
@@ -28,7 +27,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.ykotsiuba.profitsoft_2.entity.enums.ArticleMessages.ARTICLE_DELETED;
 import static com.ykotsiuba.profitsoft_2.utils.EntitySource.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -44,8 +42,6 @@ class ArticleServiceImplTest {
 
     private ArticleMapper articleMapper;
 
-    private ArticleProducer producer;
-
     private ReportGenerationService reportService;
 
     private ArticleParserService parserService;
@@ -57,8 +53,7 @@ class ArticleServiceImplTest {
         authorRepository = mock(AuthorRepository.class);
         articleMapper = new ArticleMapperImpl();
         parserService = mock(ArticleParserServiceImpl.class);
-        producer = mock(ArticleProducer.class);
-        articleService = new ArticleServiceImpl(articleRepository, producer, authorRepository,  articleMapper,  reportService,  parserService);
+        articleService = new ArticleServiceImpl(articleRepository, authorRepository,  articleMapper,  reportService,  parserService);
     }
 
     @AfterEach
@@ -71,7 +66,6 @@ class ArticleServiceImplTest {
         Article article = prepareArticle();
         Author author = prepareAuthor();
         SaveArticleRequestDTO requestDTO = prepareSaveArticleRequest();
-        doNothing().when(producer).sendReport(any());
         when(articleRepository.save(any(Article.class))).thenReturn(article);
         when(authorRepository.findById(any(UUID.class))).thenReturn(Optional.of(author));
 
